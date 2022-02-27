@@ -1,0 +1,13 @@
+.navbar-brand img {
+    height: 40px !important;
+}
+
+.section-hero {
+    height: 100vh !important;
+}
+
+#appointment-form {
+    max-width: 300px;
+    width: 100%;
+}
+
