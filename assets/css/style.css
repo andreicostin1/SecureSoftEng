@@ -32,3 +32,6 @@
 }
 
 /* Register page */
+.user-widget img {
+    border: 2px solid white;
+}
