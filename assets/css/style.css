@@ -25,13 +25,15 @@
     color: #5e72e4;
 }
 
+.user-widget img {
+    border: 2px solid white;
+}
+
 /* Home page */
 #appointment-form {
     max-width: 300px;
     width: 100%;
 }
 
-/* Register page */
-.user-widget img {
-    border: 2px solid white;
-}
+/* Profile page */
+
