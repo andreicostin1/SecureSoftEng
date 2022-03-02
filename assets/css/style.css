@@ -38,6 +38,10 @@
     background: #5e72e4;
 }
 
+.navbar-collapse .btn {
+    margin-top: 0.75rem;
+}
+
 .td-actions .btn-icon {
     width: 29px;
     height: 29px;
