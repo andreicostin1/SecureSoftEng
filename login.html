@@ -149,7 +149,7 @@
                                                         class="fa fa-hashtag"></i></span></div>
                                             <input class="form-control" placeholder="PPS Number" type="text">
                                         </div>
-                                    </div>    
+                                    </div>
 
                                     <div class="text-center">
                                         <button type="button" class="btn btn-primary mt-3">
@@ -214,10 +214,17 @@
 
     <script type="text/javascript">
         $(function () {
-            $('.datepicker').datepicker({
+            $('.birth-datepicker').datepicker({
                 format: "dd/mm/yyyy",
                 endDate: "-18y",
             });
+
+            $('.vaccine-datepicker').datepicker({
+                format: "dd/mm/yyyy",
+                endDate: "-18y",
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 </body>

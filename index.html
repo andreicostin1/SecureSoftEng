@@ -11,7 +11,7 @@
     <!--     Fonts and icons     -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     <link href="./assets/fontawesome/css/all.min.css" rel="stylesheet" />
-    
+
     <!-- CSS Files -->
     <link href="./assets/css/theme.css" rel="stylesheet" />
     <link href="./assets/css/style.css" rel="stylesheet" />
@@ -47,52 +47,24 @@
                     </div>
                 </div>
                 <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
-                    <li class="nav-item dropdown">
-                        <a href="#" class="nav-link" data-toggle="dropdown" href="#" role="button">
-                            <i class="ni ni-ui-04 d-lg-none"></i>
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link" role="button">
                             <span class="nav-link-inner--text">Home</span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-xl">
-                            <div class="dropdown-menu-inner">
-                                <a href="" class="media d-flex align-items-center">
-                                    <div class="icon icon-shape bg-gradient-primary rounded-circle text-white">
-                                        <i class="ni ni-spaceship"></i>
-                                    </div>
-                                    <div class="media-body ml-3">
-                                        <h6 class="heading text-primary mb-md-1">Leggoo</h6>
-                                        <p class="description d-none d-md-inline-block mb-0">Pickaboo</p>
-                                    </div>
-                                </a>
-                                <a href="" class="media d-flex align-items-center">
-                                    <div class="icon icon-shape bg-gradient-success rounded-circle text-white">
-                                        <i class="ni ni-palette"></i>
-                                    </div>
-                                    <div class="media-body ml-3">
-                                        <h6 class="heading text-primary mb-md-1">Foundation</h6>
-                                        <p class="description d-none d-md-inline-block mb-0">Yuhu.</p>
-                                    </div>
-                                </a>
-                                <a href="" class="media d-flex align-items-center">
-                                    <div class="icon icon-shape bg-gradient-warning rounded-circle text-white">
-                                        <i class="ni ni-ui-04"></i>
-                                    </div>
-                                    <div class="media-body ml-3">
-                                        <h5 class="heading text-warning mb-md-1">Home</h5>
-                                        <p class="description d-none d-md-inline-block mb-0">Blabla</p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
                     </li>
                     <li class="nav-item">
                         <a href="forum.html" class="nav-link" role="button">
-                            <i class="ni ni-collection d-lg-none"></i>
                             <span class="nav-link-inner--text">Ask a question</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link" href="#" role="button">
+                        <a href="stats.html" class="nav-link" role="button">
                             <span class="nav-link-inner--text">Statistics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link" role="button">
+                            <span class="nav-link-inner--text">Staff Dashboard</span>
                         </a>
                     </li>
                 </ul>
@@ -138,21 +110,22 @@
                                     Set up an appointment to get your COVID-19 vaccine!
                                 </p>
 
-                                <div id="appointment-form" class="mt-5 mx-auto">
+                                <form id="appointment-form" class="mt-5 mx-auto" action="make-appointment"
+                                    method="POST">
                                     <span class="text-white">Choose a vaccination center:</span>
-                                    <select id="inputState" class="form-control mt-1 mb-3 border-0">
+                                    <select class="form-control mt-1 mb-3 border-0" name="center">
                                         <option>RDS Vaccination Center</option>
                                         <option>2</option>
                                         <option>3</option>
                                     </select>
                                     <span class="text-white">Select the perfect day:</span>
-                                    <select id="inputState" class="form-control mt-1 mb-3 border-0">
+                                    <select class="form-control mt-1 mb-3 border-0" name="date">
                                         <option>Monday, 28.02.2022</option>
                                         <option>2</option>
                                         <option>3</option>
                                     </select>
                                     <span class="text-white">Pick the right time slot:</span>
-                                    <select id="inputState" class="form-control mt-1 mb-3 border-0">
+                                    <select class="form-control mt-1 mb-3 border-0" name="timeslot">
                                         <option>11:30am - 11:45am</option>
                                         <option>2</option>
                                         <option>3</option>
@@ -162,10 +135,11 @@
                                         <a href="" target="_blank" rel="noopener"
                                             class="btn btn-neutral-outline btn-success btn-icon">
                                             <span class="btn-inner--icon"><i class="fa fa-calendar mr-2"></i></span>
-                                            <span class="nav-link-inner--text">Make appointment</span></a>
+                                            Make appointment
+                                        </a>
                                     </div>
 
-                                </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -219,6 +193,22 @@
     <script src="./assets/js/plugins/moment.min.js"></script>
     <script src="./assets/js/plugins/bootstrap-datepicker.min.js"></script>
     <script src="./assets/js/main.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('.birth-datepicker').datepicker({
+                format: "dd/mm/yyyy",
+                endDate: "-18y",
+            });
+
+            $('.vaccine-datepicker').datepicker({
+                format: "dd/mm/yyyy",
+                endDate: "-18y",
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 </body>
 
 </html>

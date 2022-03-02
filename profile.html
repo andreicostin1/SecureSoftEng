@@ -139,13 +139,22 @@
                                 </div>
                             </div>
                             <div class="col-lg-4 order-lg-3 text-lg-right align-self-lg-center">
-                                <div class="card-profile-actions py-4 mt-lg-0">
 
+                                <!-- It's one or the other here (or none), depending on who's viewing the page -->
+                                <div class="card-profile-actions py-4 mt-lg-0 row justify-content-end">
                                     <button type="button" class="btn btn-default">
                                         <span class="btn-inner--icon">
                                             <i class="fa fa-sign-out mr-1"></i>
                                         </span>
                                         Log out
+                                    </button>
+
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#exampleModal">
+                                        <span class="btn-inner--icon">
+                                            <i class="fa fa-syringe"></i>
+                                        </span>
+                                        Assign Vaccine
                                     </button>
                                 </div>
 
@@ -171,6 +180,8 @@
                             <h3>Jessica Jones<span class="font-weight-light">, 27</span></h3>
                             <div class="h6 font-weight-300"><i class="ni location_pin mr-2"></i>Bucharest, Romania</div>
                         </div>
+
+
                         <div class="mt-5 py-5">
                             <h4>Appointments</h4>
                             <table class="table mt-4">
@@ -181,7 +192,7 @@
                                         <th>Time</th>
                                         <th>Center</th>
                                         <th>Status</th>
-                                        <th class="text-right">Cancel</th>
+                                        <th class="text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -192,8 +203,9 @@
                                         <td>RDS Vaccination Center</td>
                                         <td class="text-blue"><i class="fa fa-hourglass mr-1"></i>Pending</td>
                                         <td class="td-actions text-right">
-                                            <button type="button" class="btn btn-danger btn-icon btn-sm">
-                                                <i class="fa fa-close pt-1"></i>
+                                            <button type="button" class="btn btn-danger btn-icon btn-sm"
+                                                data-toggle="tooltip" data-placement="top" title="Cancel appointment">
+                                                <i class="fa fa-close"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -204,8 +216,9 @@
                                         <td>RDS Vaccination Center</td>
                                         <td class="text-danger"><i class="fa fa-close mr-1"></i>Cancelled</td>
                                         <td class="td-actions text-right">
-                                            <button type="button" class="btn btn-neutral btn-icon btn-sm">
-                                                <i class="fa fa-info"></i>
+                                            <button type="button" class="btn btn-success btn-icon btn-sm"
+                                                data-toggle="tooltip" data-placement="top" title="Complete">
+                                                <i class="fa fa-check"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -216,7 +229,8 @@
                                         <td>RDS Vaccination Center</td>
                                         <td class="text-success"><i class="fa fa-check mr-1"></i>Done</td>
                                         <td class="td-actions text-right">
-                                            <button type="button" class="btn btn-neutral btn-icon btn-sm">
+                                            <button type="button" class="btn btn-neutral btn-icon btn-sm"
+                                                data-toggle="tooltip" data-placement="top" title="Details">
                                                 <i class="fa fa-info"></i>
                                             </button>
                                         </td>
@@ -246,6 +260,46 @@
 
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assign Vaccine Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Assign vaccine</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="vaccinate" method="POST">
+
+                                    <div class="form-group">
+                                        <div class="input-group date vaccine-datepicker">
+                                            <div class="input-group-addon">
+                                                <span class="input-group-text">
+                                                    <i class="fa fa-calendar"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Date (dd/mm/yyyy)">
+                                        </div>
+                                    </div>
+
+                                    <select id="inputState" class="form-control mt-1 mb-3">
+                                        <option>Select vaccine</option>
+                                        <option>Pfizer</option>
+                                        <option>Moderna</option>
+                                    </select>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -290,7 +344,6 @@
     </div>
     <!--   Core JS Files   -->
     <script src="./assets/js/core/jquery.min.js" type="text/javascript"></script>
-    <script src="./assets/js/core/popper.min.js" type="text/javascript"></script>
     <script src="./assets/js/core/bootstrap.min.js" type="text/javascript"></script>
     <script src="./assets/js/plugins/bootstrap-switch.js"></script>
     <script src="./assets/js/plugins/nouislider.min.js" type="text/javascript"></script>
@@ -300,10 +353,17 @@
 
     <script type="text/javascript">
         $(function () {
-            $('.datepicker').datepicker({
+            $('.birth-datepicker').datepicker({
                 format: "dd/mm/yyyy",
                 endDate: "-18y",
             });
+
+            $('.vaccine-datepicker').datepicker({
+                format: "dd/mm/yyyy",
+                endDate: "-18y",
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 </body>

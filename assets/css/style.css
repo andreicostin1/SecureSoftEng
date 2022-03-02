@@ -38,6 +38,11 @@
     background: #5e72e4;
 }
 
+.td-actions .btn-icon {
+    width: 29px;
+    height: 29px;
+}
+
 /* Home page */
 #appointment-form {
     max-width: 300px;
@@ -45,4 +50,3 @@
 }
 
 /* Forum page */
-

@@ -62,6 +62,11 @@
                             <span class="nav-link-inner--text">Statistics</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link" role="button">
+                            <span class="nav-link-inner--text">Staff Dashboard</span>
+                        </a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav align-items-lg-center ml-lg-auto">
                     <li class="nav-item d-none d-lg-block ml-lg-4">
@@ -86,103 +91,66 @@
             <div class="navbar-background"></div>
             <div class="page-header">
                 <div class="container shape-container py-lg text-white">
-                    <div class="d-flex mb-5">
-                        <h3 class="mb-0 mr-auto">Asked questions</h3>
-                        <a href="ask-a-question.html" class="btn btn-primary">
-                            Ask a question
-                        </a>
-                    </div>
-
                     <div class="card mt-3 shadow-sm" style="width: 100%;">
                         <div class="card-body py-3 px-5">
-                            <div class="row align-items-center">
-                                <div class="mr-auto">
-                                    <a href="question.html">
-                                        <h5 class="card-title mb-3">Can I get both Moderna and Pfizer vaccines?</h5>
-                                    </a>
-                                    <h6 class="card-subtitle mb-0">
-                                        <a href="profile.html">@Jessica Jones</a>
-                                        <span class="text-muted">&nbsp;&nbsp;<small>22/07/2021</small></span>
-                                    </h6>
+                            <form action="goto-user" method="POST">
+                                <h5 class="card-title mb-3">Find user</h5>
+                                <div class="form-group input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="fa fa-hashtag"></i>
+                                        </span>
+                                    </div>
+                                    <input class="form-control" placeholder="PPS Number" type="text" name="ppsn">
                                 </div>
-                                <a href="question.html">1 answer</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mt-3 shadow-sm" style="width: 100%;">
-                        <div class="card-body py-3 px-5">
-                            <div class="row align-items-center">
-                                <div class="mr-auto">
-                                    <a href="question.html">
-                                        <h5 class="card-title mb-3">How many booster shots do I need?</h5>
-                                    </a>
-                                    <h6 class="card-subtitle mb-0">
-                                        <a href="profile.html">@Jason Statham</a>
-                                        <span class="text-muted">&nbsp;&nbsp;<small>22/07/2022</small></span>
-                                    </h6>
-                                </div>
-                                <a href="question.html">2 answers</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mt-3 shadow-sm" style="width: 100%;">
-                        <div class="card-body py-3 px-5">
-                            <div class="row align-items-center">
-                                <div class="mr-auto">
-                                    <a href="question.html">
-                                        <h5 class="card-title mb-3">How rare are the side effects?</h5>
-                                    </a>
-                                    <h6 class="card-subtitle mb-0">
-                                        <a href="profile.html">@Jessica Jones</a>
-                                        <span class="text-muted">&nbsp;&nbsp;<small>22/07/2021</small></span>
-                                    </h6>
-                                </div>
-                                <a href="question.html">0 answers</a>
-                            </div>
+                                <button class="btn btn-primary" type="submit">
+                                    <span class="btn-inner--icon"><i class="fa fa-search mr-1"></i></span>
+                                    Search
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
 
-        <footer class="footer">
-            <div class="container">
-                <div class="row row-grid align-items-center my-md">
-                    <div class="col-lg-12">
-                        <h3 class="text-primary font-weight-light mb-2">
-                            <i class="fa fa-thumbs-up"></i>
-                            You can totally trust us!
-                        </h3>
-                        <h6 class="mb-0 font-weight-light">Disclaimer: the long-term effects of the vaccine are unknown.
-                            We take no responsibility.</h6>
-                    </div>
-                </div>
-                <hr>
-                <div class="row align-items-center justify-content-md-between">
-                    <div class="col-md-6">
-                        <div class="copyright">
-                            &copy; 2022 <a href="" target="_blank">HSE VaxApp</a>.
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <ul class="nav nav-footer justify-content-end">
-                            <li class="nav-item">
-                                <a href="" class="nav-link">About Us</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="" class="nav-link">Forum</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="" class="nav-link">License</a>
-                            </li>
-                        </ul>
-                    </div>
+    <footer class="footer">
+        <div class="container">
+            <div class="row row-grid align-items-center my-md">
+                <div class="col-lg-12">
+                    <h3 class="text-primary font-weight-light mb-2">
+                        <i class="fa fa-thumbs-up"></i>
+                        You can totally trust us!
+                    </h3>
+                    <h6 class="mb-0 font-weight-light">Disclaimer: the long-term effects of the vaccine are unknown.
+                        We take no responsibility.</h6>
                 </div>
             </div>
-        </footer>
+            <hr>
+            <div class="row align-items-center justify-content-md-between">
+                <div class="col-md-6">
+                    <div class="copyright">
+                        &copy; 2022 <a href="" target="_blank">HSE VaxApp</a>.
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <ul class="nav nav-footer justify-content-end">
+                        <li class="nav-item">
+                            <a href="" class="nav-link">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">Forum</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">License</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
     </div>
     <!--   Core JS Files   -->
     <script src="./assets/js/core/jquery.min.js" type="text/javascript"></script>
