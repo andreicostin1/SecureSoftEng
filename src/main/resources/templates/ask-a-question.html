@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head th:insert="fragments/head :: head"></head>
+  <body class="index-page">
+    <!-- Navbar -->
+    <nav id="navbar-main" class="navbar navbar-main navbar-expand-lg navbar-light navbar-transparent top-0 py-3">
+      <div class="container">
+        <a class="navbar-brand mr-lg-5" href="./index.html">
+          <img src="/images/logo.svg" />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbar_global"
+          aria-controls="navbar_global"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse" id="navbar_global">
+          <div class="navbar-collapse-header">
+            <div class="row">
+              <div class="col-6 collapse-brand">
+                <a href="./index.html">
+                  <img src="/images/logo.svg" />
+                </a>
+              </div>
+              <div class="col-6 collapse-close">
+                <button
+                  type="button"
+                  class="navbar-toggler"
+                  data-toggle="collapse"
+                  data-target="#navbar_global"
+                  aria-controls="navbar_global"
+                  aria-expanded="false"
+                  aria-label="Toggle navigation"
+                >
+                  <span></span>
+                  <span></span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link" data-toggle="dropdown" href="#" role="button">
+                <i class="ni ni-ui-04 d-lg-none"></i>
+                <span class="nav-link-inner--text">Home</span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-xl">
+                <div class="dropdown-menu-inner">
+                  <a href="" class="media d-flex align-items-center">
+                    <div class="icon icon-shape bg-gradient-primary rounded-circle text-white">
+                      <i class="ni ni-spaceship"></i>
+                    </div>
+                    <div class="media-body ml-3">
+                      <h6 class="heading text-primary mb-md-1">Leggoo</h6>
+                      <p class="description d-none d-md-inline-block mb-0">Pickaboo</p>
+                    </div>
+                  </a>
+                  <a href="" class="media d-flex align-items-center">
+                    <div class="icon icon-shape bg-gradient-success rounded-circle text-white">
+                      <i class="ni ni-palette"></i>
+                    </div>
+                    <div class="media-body ml-3">
+                      <h6 class="heading text-primary mb-md-1">Foundation</h6>
+                      <p class="description d-none d-md-inline-block mb-0">Yuhu.</p>
+                    </div>
+                  </a>
+                  <a href="" class="media d-flex align-items-center">
+                    <div class="icon icon-shape bg-gradient-warning rounded-circle text-white">
+                      <i class="ni ni-ui-04"></i>
+                    </div>
+                    <div class="media-body ml-3">
+                      <h5 class="heading text-warning mb-md-1">Home</h5>
+                      <p class="description d-none d-md-inline-block mb-0">Blabla</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a href="forum.html" class="nav-link" role="button">
+                <i class="ni ni-collection d-lg-none"></i>
+                <span class="nav-link-inner--text">Ask a question</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" href="#" role="button">
+                <span class="nav-link-inner--text">Statistics</span>
+              </a>
+            </li>
+          </ul>
+          <ul class="navbar-nav align-items-lg-center ml-lg-auto">
+            <li class="nav-item d-none d-lg-block ml-lg-4">
+              <a href="login.html" rel="noopener" class="btn btn-neutral btn-icon">
+                <span class="btn-inner--icon"><i class="fa fa-user mr-2"></i></span>
+                <span class="nav-link-inner--text">Sign in</span>
+              </a>
+            </li>
+            <li class="nav-item d-none d-lg-block">
+              <a href="register.html" rel="noopener" class="btn btn-neutral-outline btn-success btn-icon">
+                <span class="btn-inner--icon"><i class="fa fa-plus mr-2"></i></span>
+                <span class="nav-link-inner--text">Create account</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- End Navbar -->
+    <div class="wrapper">
+      <div class="section section-shaped bg-secondary">
+        <div class="navbar-background"></div>
+        <div class="page-header">
+          <div class="container shape-container py-lg">
+            <div class="card mt-3 shadow" style="width: 100%">
+              <div class="card-body p-5">
+                <h4 class="card-title">Ask away!</h4>
+                <h6 class="card-subtitle mb-4 text-muted">
+                  Our staff is here 24/7 to make sure you have all the facts!
+                </h6>
+
+                <form action="/ask-a-question" method="POST">
+                  <div class="form-group">
+                    <input type="text" class="form-control" name="question" placeholder="Question" />
+                  </div>
+                  <div class="form-group">
+                    <textarea
+                      class="form-control"
+                      rows="3"
+                      name="details"
+                      placeholder="Optional: you can provide more details here"
+                    ></textarea>
+                  </div>
+                  <button class="btn btn-primary" type="submit">I wanna know!</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer th:insert="fragments/footer :: footer"></footer>
+    </div>
+  </body>
+</html>
