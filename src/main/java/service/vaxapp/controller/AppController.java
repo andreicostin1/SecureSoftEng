@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import service.vaxapp.model.User;
 import service.vaxapp.repository.*;
 
 @Controller
@@ -53,7 +54,9 @@ public class AppController {
 
     @PostMapping("/login")
     public String loginSubmit(@RequestParam("email") String email, @RequestParam("pps") String pps) {
-        if (userRepository.findUserByPPS(pps) == null) {
+        // make sure the user is found in db by PPS number, and confirm email matches
+        User login = userRepository.findUserByPPS(pps);
+        if (login == null || !login.getEmail().equals(email)) {
             return "login.html";
         }
         return "index.html";
