@@ -8,12 +8,12 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class VaccineId implements Serializable {
     private Integer doseNumber;
-    private Integer userPPS;
+    private String userPPS;
 
     public VaccineId() {
     }
 
-    public VaccineId(Integer doseNumber, Integer userPPS) {
+    public VaccineId(Integer doseNumber, String userPPS) {
         this.doseNumber = doseNumber;
         this.userPPS = userPPS;
     }
@@ -42,11 +42,11 @@ public class VaccineId implements Serializable {
         this.doseNumber = doseNumber;
     }
 
-    public Integer getUserPPS() {
+    public String getUserPPS() {
         return userPPS;
     }
 
-    public void setUserPPS(Integer userPPS) {
+    public void setUserPPS(String userPPS) {
         this.userPPS = userPPS;
     }
 }

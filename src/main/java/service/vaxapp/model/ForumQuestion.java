@@ -23,7 +23,7 @@ public class ForumQuestion {
     private String question;
 
     // Bidirectional one-to-many relationship (One question may have many answers)
-    @OneToMany(mappedBy = "answer")
+    @OneToMany(mappedBy = "question")
     private List<ForumAnswer> answers;
 
     // Bidirectional many-to-one relationship (Many questions may be asked by one

@@ -17,8 +17,7 @@ public class Vaccine {
     @EmbeddedId
     private VaccineId vaccineId;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_pps")
+    @ManyToOne
     @MapsId("userPPS")
     private User user;
 
