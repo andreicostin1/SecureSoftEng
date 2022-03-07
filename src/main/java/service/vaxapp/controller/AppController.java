@@ -4,11 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import service.vaxapp.model.User;
 import service.vaxapp.repository.*;
 
 @Controller
@@ -56,6 +53,9 @@ public class AppController {
 
     @PostMapping("/loginSubmit")
     public String loginSubmit(@RequestParam("email") String email, @RequestParam("pps") String pps) {
+        if (userRepository.findUserByPPS(pps) == null) {
+            return "login.html";
+        }
         return "index.html";
     }
 

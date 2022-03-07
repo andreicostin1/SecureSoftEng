@@ -1,13 +1,8 @@
 package service.vaxapp.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "users")
@@ -47,8 +42,7 @@ public class User {
     public User() {
     }
 
-    public User(String PPS, String fullName, String address, String phoneNumber, String email, LocalDate dateOfBirth,
-            String nationality, String gender) {
+    public User(String PPS, String fullName, String address, String phoneNumber, String email, LocalDate dateOfBirth, String nationality, String gender) {
         this.PPS = PPS;
         this.fullName = fullName;
         this.address = address;
