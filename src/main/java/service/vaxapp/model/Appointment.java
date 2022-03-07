@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,12 +26,14 @@ public class Appointment {
 
     // Unidirectional one-to-one relationship (An appointment involves one type of
     // vaccine)
-    @OneToOne(mappedBy = "appointment", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(targetEntity = VaccineType.class, cascade = CascadeType.ALL)
+    // @JoinColumn(name = "vaccine_type_id", referencedColumnName = "id")
     private VaccineType vaccineType;
 
     // Unidirectional one-to-one relationship (An appointment involves one vaccine
     // centre)
-    @OneToOne(mappedBy = "appointment", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(targetEntity = VaccineCentre.class, cascade = CascadeType.ALL)
+    // @JoinColumn(name = "vaccine_centre_id", referencedColumnName = "id")
     private VaccineCentre vaccineCentre;
 
     // Bidirectional many-to-one relationship (A user may have multiple vaccine

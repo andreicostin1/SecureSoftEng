@@ -10,17 +10,20 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "forum_question")
 public class ForumQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column
     private String question;
 
     // Bidirectional one-to-many relationship (One question may have many answers)
-    @OneToMany(mappedBy = "forum_question")
+    @OneToMany(mappedBy = "answer")
     private List<ForumAnswer> answers;
 
     // Bidirectional many-to-one relationship (Many questions may be asked by one

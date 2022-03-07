@@ -27,12 +27,12 @@ public class Vaccine {
 
     // Unidirectional one-to-one relationship (One vaccine may be of one vaccine
     // type)
-    @OneToOne(mappedBy = "vaccine", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(targetEntity = VaccineType.class, cascade = CascadeType.ALL)
     private VaccineType vaccineType;
 
     // Unidirectional one-to-one relationship (One vaccine may be given at one
     // vaccine centre)
-    @OneToOne(mappedBy = "vaccine", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(targetEntity = VaccineCentre.class, cascade = CascadeType.ALL)
     private VaccineCentre vaccineCentre;
 
     // Bidirectional many-to-one relationship (Many vaccines may be assigned by one
