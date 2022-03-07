@@ -5,14 +5,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import service.vaxapp.repository.AdminRepository;
-import service.vaxapp.repository.AppointmentRepository;
-import service.vaxapp.repository.ForumAnswerRepository;
-import service.vaxapp.repository.ForumQuestionRepository;
-import service.vaxapp.repository.UserRepository;
-import service.vaxapp.repository.VaccineCentreRepository;
-import service.vaxapp.repository.VaccineRepository;
-import service.vaxapp.repository.VaccineTypeRepository;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import service.vaxapp.model.User;
+import service.vaxapp.repository.*;
 
 @Controller
 public class AppController {
@@ -55,6 +52,11 @@ public class AppController {
     public String login(Model model) {
         // TODO - add DB retrieval logic
         return "login.html";
+    }
+
+    @PostMapping("/loginSubmit")
+    public String loginSubmit(@RequestParam("email") String email, @RequestParam("pps") String pps) {
+        return "index.html";
     }
 
     @GetMapping("/register")
