@@ -51,7 +51,7 @@ public class AppController {
         return "login.html";
     }
 
-    @PostMapping("/loginSubmit")
+    @PostMapping("/login")
     public String loginSubmit(@RequestParam("email") String email, @RequestParam("pps") String pps) {
         if (userRepository.findUserByPPS(pps) == null) {
             return "login.html";
