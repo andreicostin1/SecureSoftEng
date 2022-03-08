@@ -119,8 +119,8 @@
                     <div class="card bg-secondary shadow border-0">
                         <div class="card-body px-lg-5 py-lg-5 bg-white rounded-lg">
                             <h3>Welcome! 👋</h3>
-                            <p>Some text here selling the shit out of this register form.</p>
-                            <form role="form">
+                            <p>Please register below!</p>
+                            <form role="form" action="/register" method="post">
                                 <div class="form-group">
                                     <div class="form-group">
                                         <div class="input-group mb-3">
@@ -136,7 +136,7 @@
                                             <span class="input-group-text"><i class="fa fa-user"></i></span>
                                         </div>
                                         <input class="form-control" placeholder="Full Name" type="text"
-                                               name="fullname"/>
+                                               name="fullName"/>
                                     </div>
                                 </div>
 
@@ -145,7 +145,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
                                         </div>
-                                        <input class="form-control" placeholder="PPS Number" type="text" name="ppsn"/>
+                                        <input class="form-control" placeholder="PPS Number" type="text" name="PPS"/>
                                     </div>
                                 </div>
 
@@ -154,7 +154,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa fa-phone"></i></span>
                                         </div>
-                                        <input class="form-control" placeholder="Phone" type="text" name="phone"/>
+                                        <input class="form-control" placeholder="Phone" type="text" name="phoneNumber"/>
                                     </div>
                                 </div>
 
@@ -178,7 +178,7 @@
                         </span>
                                         </div>
                                         <input type="text" class="form-control" placeholder="Date of birth (dd/mm/yyyy)"
-                                               name="birthdate"/>
+                                               name="dateOfBirth"/>
                                     </div>
                                 </div>
 
@@ -394,7 +394,7 @@
                           <i class="fa fa-venus-mars"></i>
                         </span>
                                         </div>
-                                        <select name="sex" class="form-control">
+                                        <select name="gender" class="form-control">
                                             <option value="">Sex</option>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
@@ -406,7 +406,7 @@
                                     <div class="text-muted font-italic">
                                         <small> * You must be 18 years of age to register </small>
                                     </div>
-                                    <button type="button" class="btn btn-primary mt-4">
+                                    <button type="submit" class="btn btn-primary mt-4">
                                         <span class="btn-inner--icon"><i class="fa fa-user-plus mr-2"></i></span>
                                         Register
                                     </button>

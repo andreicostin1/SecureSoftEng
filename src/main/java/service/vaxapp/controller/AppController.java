@@ -1,11 +1,10 @@
 package service.vaxapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import service.vaxapp.model.User;
 import service.vaxapp.repository.*;
 
@@ -53,7 +52,7 @@ public class AppController {
     }
 
     @PostMapping("/login")
-    public String loginSubmit(@RequestParam("email") String email, @RequestParam("pps") String pps) {
+    public String login(@RequestParam("email") String email, @RequestParam("pps") String pps) {
         // make sure the user is found in db by PPS number, and confirm email matches
         User login = userRepository.findUserByPPS(pps);
         if (login == null || !login.getEmail().equals(email)) {
@@ -66,6 +65,15 @@ public class AppController {
     public String register(Model model) {
         // TODO - add DB retrieval logic
         return "register.html";
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String register(User user) {
+        if (userRepository.findUserByPPS(user.getPPS()) != null) {
+            return "/index.html";
+        }
+        userRepository.save(user);
+        return "/login.html";
     }
 
     @GetMapping("/forum")

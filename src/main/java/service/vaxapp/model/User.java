@@ -1,6 +1,7 @@
 package service.vaxapp.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -51,7 +52,6 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.nationality = nationality;
         this.gender = gender;
-
     }
 
     public String getPPS() {
