@@ -20,7 +20,7 @@ public class User {
     @Column
     private String email;
     @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
+    private String dateOfBirth;
     @Column
     private String nationality;
     @Column
@@ -43,7 +43,8 @@ public class User {
     public User() {
     }
 
-    public User(String PPS, String fullName, String address, String phoneNumber, String email, LocalDate dateOfBirth, String nationality, String gender) {
+    public User(String PPS, String fullName, String address, String phoneNumber, String email, String dateOfBirth,
+            String nationality, String gender) {
         this.PPS = PPS;
         this.fullName = fullName;
         this.address = address;
@@ -94,11 +95,11 @@ public class User {
         this.email = email;
     }
 
-    public LocalDate getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
