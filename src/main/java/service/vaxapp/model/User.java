@@ -1,18 +1,17 @@
 package service.vaxapp.model;
 
-import java.time.LocalDate;
-import java.util.List;
+import javax.persistence.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import org.hibernate.annotations.Type;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
 public class User {
     @Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
     @Column(name = "user_pps", unique = true)
     private String PPS;
     @Column(name = "full_name")
@@ -24,11 +23,14 @@ public class User {
     @Column
     private String email;
     @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
+    private String dateOfBirth;
     @Column
     private String nationality;
     @Column
     private String gender;
+    @Column(nullable = false)
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    private Boolean admin = false;
 
     // Bidirectional one-to-many relationship (One user may get multiple vaccines)
     @OneToMany(mappedBy = "user")
@@ -47,8 +49,8 @@ public class User {
     public User() {
     }
 
-    public User(String PPS, String fullName, String address, String phoneNumber, String email, LocalDate dateOfBirth,
-            String nationality, String gender) {
+    public User(String PPS, String fullName, String address, String phoneNumber, String email, String dateOfBirth,
+            String nationality, String gender, Boolean admin) {
         this.PPS = PPS;
         this.fullName = fullName;
         this.address = address;
@@ -57,15 +59,19 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.nationality = nationality;
         this.gender = gender;
+        this.admin = admin;
+    }
 
+    public Integer getId() {
+        return id;
     }
 
     public String getPPS() {
         return PPS;
     }
 
-    public void setPPS(String pPS) {
-        PPS = pPS;
+    public void setPPS(String PPS) {
+        this.PPS = PPS;
     }
 
     public String getFullName() {
@@ -100,11 +106,11 @@ public class User {
         this.email = email;
     }
 
-    public LocalDate getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -122,5 +128,9 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Boolean isAdmin() {
+        return admin;
     }
 }

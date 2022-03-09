@@ -18,7 +18,7 @@ public class Vaccine {
     private VaccineId vaccineId;
 
     @ManyToOne
-    @MapsId("userPPS")
+    @MapsId("user_pps")
     private User user;
 
     @Column(name = "date_received")
@@ -37,8 +37,8 @@ public class Vaccine {
     // Bidirectional many-to-one relationship (Many vaccines may be assigned by one
     // admin)
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "admin_pps")
-    private Admin admin;
+    @JoinColumn(name = "user_pps")
+    private User admin;
 
     public Vaccine() {
     }
@@ -55,12 +55,12 @@ public class Vaccine {
         this.vaccineId = vaccineId;
     }
 
-    public Admin getAdmin() {
+    public User getAdmin() {
         return admin;
     }
 
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
+    public void setAdmin(User admin) {
+        this.user = admin;
     }
 
     public VaccineType getVaccineType() {

@@ -27,8 +27,8 @@ public class ForumAnswer {
 
     // Bidirectional many-to-one relationship (An admin may give multiple answers)
     @ManyToOne
-    @JoinColumn(name = "admin_pps", nullable = false)
-    private Admin admin;
+    @JoinColumn(name = "user_pps", nullable = false)
+    private User admin;
 
     public ForumAnswer() {
     }
@@ -61,11 +61,11 @@ public class ForumAnswer {
         this.question = question;
     }
 
-    public Admin getAdmin() {
+    public User getAdmin() {
         return admin;
     }
 
-    public void setAdmin(Admin admin) {
+    public void setAdmin(User admin) {
         this.admin = admin;
     }
 }
