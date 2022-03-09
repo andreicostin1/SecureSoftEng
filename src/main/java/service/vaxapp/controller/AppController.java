@@ -1,10 +1,16 @@
 package service.vaxapp.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import service.vaxapp.model.ForumQuestion;
 import service.vaxapp.repository.AdminRepository;
 import service.vaxapp.repository.AppointmentRepository;
 import service.vaxapp.repository.ForumAnswerRepository;
@@ -65,13 +71,30 @@ public class AppController {
 
     @GetMapping("/forum")
     public String forum(Model model) {
-        // TODO - add DB retrieval logic + authorization check
+        // Retrieve all questions and answers from database
+        List<ForumQuestion> questions = forumQuestionRepository.findAll();
+        model.addAttribute("questions", questions);
+        // TODO
+        // STEP 3. Add dynamic thymeleaf display of retrieved model
+        // STEP 4. In frontend, if model is empty, display "There are no questions yet"
         return "forum.html";
     }
 
     @GetMapping("/ask-a-question")
     public String askAQuestion(Model model) {
-        // TODO - add DB retrieval logic + authorization check
+        // TODO
+        // If admin, return to index page
+        // If user, return ask a question page
+        return "ask-a-question.html";
+    }
+
+    @PostMapping("/ask-a-question")
+    public String askAQuestion(@RequestBody Question question) {
+        // TODO
+        // STEP 1. retrieve question data
+        // STEP 2. Retrieve current date in string format // not needed
+        // STEP 3. Add question data to database
+        // STEP 4. Return corresponding question page
         return "ask-a-question.html";
     }
 
@@ -82,9 +105,52 @@ public class AppController {
     }
 
     @GetMapping("/question")
-    public String question(Model model) {
-        // TODO - add DB retrieval logic + authorization check + question id
+    public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
+        // TODO
+        // STEP 1. Add question details to model
+        // STEP 2. Add answer details to model
+        // STEP 3. If user, return question without answer functionality
+        // STEP 3. If admin, return question with answer functionality
+        // STEP 4. return model and correct page
         return "question.html";
     }
 
+    @PostMapping("/question")
+    public String answerQuestion(@RequestParam(name = "id") Integer id, @RequestBody Answer answer) {
+        // TODO - check if authorized to answer (if session is admin)
+        // If admin, get adminId
+        // Add answer to databse for the question with id
+        //
+        return "";
+    }
+
+    /**
+     * /########################
+     * <p>
+     * DTOs
+     * </p>
+     * /#######################
+     */
+
+    static class Question {
+        public String title;
+        public String details;
+        public String dateSubmitted;
+
+        public Question(String title, String details, String dateSubmitted) {
+            this.title = title;
+            this.details = details;
+            this.dateSubmitted = dateSubmitted;
+        }
+    }
+
+    static class Answer {
+        public String body;
+        public String dateSubmitted;
+
+        public Answer(String body, String dateSubmitted) {
+            this.body = body;
+            this.dateSubmitted = dateSubmitted;
+        }
+    }
 }
