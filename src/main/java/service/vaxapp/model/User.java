@@ -1,14 +1,14 @@
 package service.vaxapp.model;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
 public class User {
     @Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
     @Column(name = "user_pps", unique = true)
     private String PPS;
     @Column(name = "full_name")
