@@ -1,6 +1,9 @@
 package service.vaxapp.model;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.Type;
+
 import java.util.List;
 
 @Entity
@@ -25,6 +28,9 @@ public class User {
     private String nationality;
     @Column
     private String gender;
+    @Column(nullable = false)
+    @Type(type = "org.hibernate.type.NumericBooleanType")
+    private Boolean admin = false;
 
     // Bidirectional one-to-many relationship (One user may get multiple vaccines)
     @OneToMany(mappedBy = "user")
@@ -44,7 +50,7 @@ public class User {
     }
 
     public User(String PPS, String fullName, String address, String phoneNumber, String email, String dateOfBirth,
-            String nationality, String gender) {
+            String nationality, String gender, Boolean admin) {
         this.PPS = PPS;
         this.fullName = fullName;
         this.address = address;
@@ -53,14 +59,19 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.nationality = nationality;
         this.gender = gender;
+        this.admin = admin;
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public String getPPS() {
         return PPS;
     }
 
-    public void setPPS(String pPS) {
-        PPS = pPS;
+    public void setPPS(String PPS) {
+        this.PPS = PPS;
     }
 
     public String getFullName() {
@@ -117,5 +128,9 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Boolean isAdmin() {
+        return admin;
     }
 }
