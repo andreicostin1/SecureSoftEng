@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import service.vaxapp.model.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, String> {
 }

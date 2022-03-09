@@ -1,5 +1,6 @@
 package service.vaxapp.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -20,7 +21,7 @@ public class ForumQuestion {
     private Integer id;
 
     @Column
-    private String body;
+    private String title;
 
     @Column
     private String details;
@@ -41,8 +42,8 @@ public class ForumQuestion {
     public ForumQuestion() {
     }
 
-    public ForumQuestion(String body, String details, String dateSubmitted) {
-        this.body = body;
+    public ForumQuestion(String title, String details, String dateSubmitted) {
+        this.title = title;
         this.details = details;
         this.dateSubmitted = dateSubmitted;
     }
@@ -55,12 +56,12 @@ public class ForumQuestion {
         this.id = id;
     }
 
-    public String getBody() {
-        return body;
+    public String getTitle() {
+        return title;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDetails() {
@@ -85,6 +86,13 @@ public class ForumQuestion {
 
     public void setAnswers(List<ForumAnswer> answers) {
         this.answers = answers;
+    }
+
+    public void addAnswer(ForumAnswer answer) {
+        if (this.answers == null) {
+            this.answers = new ArrayList<>();
+        }
+        this.answers.add(answer);
     }
 
     public User getUser() {

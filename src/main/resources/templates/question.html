@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
   <head th:insert="fragments/head :: head"> </head>
   <body class="index-page">
     <!-- Navbar -->
@@ -119,38 +119,33 @@
         <div class="navbar-background"></div>
         <div class="page-header">
           <div class="container py-lg px-4">
-            <h4 class="question-title mb-2">How many booster shots do I need?</h4>
+            <h4 class="question-title mb-2" th:text="${question.title}"></h4>
             <h6 class="question-details mb-3">
-              <a href="/profile">@Jessica Jones</a>
-              <span class="text-muted">&nbsp;&nbsp;<small>22/07/2021</small></span>
+              <a
+                th:href="@{/profile(id=${question.getUser().id})}"
+                th:text="@${question.getUser().fullName}"
+              ></a>
+              <span class="text-muted">&nbsp;&nbsp;<small th:text="${question.dateSubmitted}"></small></span>
             </h6>
-            <h6 class="question-text mb-4">
-              I have 5 doses of Pfizer! Do I really need the 6th one? Thanks!
-            </h6>
+            <h6 class="question-text mb-4" th:text="${question.details}"></h6>
 
             <div class="answers mt-6">
-              <div class="answer card mt-2">
+              <div th:each="answer : ${question.answers}" th:id="${answer.id}" class="answer card mt-2">
                 <div class="card-body">
                   <h6 class="question-details mb-3">
-                    <a href="/profile">@HSE</a>
-                    <span class="text-muted">&nbsp;&nbsp;<small>22/07/2021</small></span>
+                    <a
+                      th:href="@{/profile(id=${answers.getAdmin().id})}"
+                      th:text="@${answer.getAdmin().name}"
+                    ></a>
+                    <span class="text-muted"
+                      >&nbsp;&nbsp;<small th:text="${answer.dateSubmitted}"></small
+                    ></span>
                   </h6>
-                  <h6 class="card-title mb-0">Yes!</h6>
-                </div>
-              </div>
-              <div class="answer card mt-2">
-                <div class="card-body">
-                  <h6 class="question-details mb-3">
-                    <a href="/profile">@Doctor Rose</a>
-                    <span class="text-muted">&nbsp;&nbsp;<small>22/07/2021</small></span>
-                  </h6>
-                  <h6 class="card-title mb-0">
-                    Hi Jessica! You only need another booster shot if you have low antibody levels.
-                  </h6>
+                  <h6 class="card-title mb-0" th:text="${answer.body}"></h6>
                 </div>
               </div>
             </div>
-
+            <!-- TODO: check if user is admin and only show this form if true -->
             <div class="post-answer mt-6">
               <form action="/ask-a-question" method="POST">
                 <h4>Post an answer</h4>

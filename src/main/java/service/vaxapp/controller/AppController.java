@@ -1,6 +1,7 @@
 package service.vaxapp.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,8 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import service.vaxapp.model.Admin;
+import service.vaxapp.model.ForumAnswer;
 import service.vaxapp.model.ForumQuestion;
+import service.vaxapp.model.User;
 import service.vaxapp.repository.AdminRepository;
 import service.vaxapp.repository.AppointmentRepository;
 import service.vaxapp.repository.ForumAnswerRepository;
@@ -74,9 +79,6 @@ public class AppController {
         // Retrieve all questions and answers from database
         List<ForumQuestion> questions = forumQuestionRepository.findAll();
         model.addAttribute("questions", questions);
-        // TODO
-        // STEP 3. Add dynamic thymeleaf display of retrieved model
-        // STEP 4. In frontend, if model is empty, display "There are no questions yet"
         return "forum.html";
     }
 
@@ -89,12 +91,22 @@ public class AppController {
     }
 
     @PostMapping("/ask-a-question")
-    public String askAQuestion(@RequestBody Question question) {
-        // TODO
-        // STEP 1. retrieve question data
-        // STEP 2. Retrieve current date in string format // not needed
-        // STEP 3. Add question data to database
-        // STEP 4. Return corresponding question page
+    @ResponseBody
+    public String askAQuestion(@RequestBody Question question, Model model) {
+        // Retrieve user account
+        // TODO: retrieve user info from session instead
+        // If user is logged in, allow question
+        // Otherwise do not allow question
+        Optional<User> user = userRepository.findById("1234567A");
+        if (user.isPresent()) {
+            ForumQuestion newQuestion = new ForumQuestion(question.title, question.details, question.dateSubmitted);
+            newQuestion.setUser(user.get());
+            // Add question to database
+            forumQuestionRepository.save(newQuestion);
+            model.addAttribute("question", newQuestion);
+            return "question.html";
+        }
+
         return "ask-a-question.html";
     }
 
@@ -107,21 +119,39 @@ public class AppController {
     @GetMapping("/question")
     public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
         // TODO
-        // STEP 1. Add question details to model
-        // STEP 2. Add answer details to model
+        // Retrieve session info on user
         // STEP 3. If user, return question without answer functionality
         // STEP 3. If admin, return question with answer functionality
-        // STEP 4. return model and correct page
-        return "question.html";
+        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
+        if (question.isPresent()) {
+            model.addAttribute("question", question);
+            return "question.html";
+        }
+        return "redirect:/forum";
     }
 
     @PostMapping("/question")
-    public String answerQuestion(@RequestParam(name = "id") Integer id, @RequestBody Answer answer) {
-        // TODO - check if authorized to answer (if session is admin)
-        // If admin, get adminId
-        // Add answer to databse for the question with id
-        //
-        return "";
+    public String answerQuestion(@RequestParam(name = "id") Integer id, @RequestBody Answer answer, Model model) {
+        // TODO
+        // Retrieve user account using session
+        // If admin, add answer to databse for the question with id and save answer and
+        // question updates to db
+        // If user, do not allow answer & return redirect with error
+        Optional<Admin> admin = adminRepository.findById("987654AB"); // TODO - use session instead
+        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
+        if (admin.isPresent() && question.isPresent()) {
+            ForumAnswer newAnswer = new ForumAnswer(answer.body, answer.dateSubmitted);
+            newAnswer.setAdmin(admin.get());
+            newAnswer.setQuestion(question.get());
+            question.get().addAnswer(newAnswer);
+            // Save forum question and answer
+            forumAnswerRepository.save(newAnswer);
+            forumQuestionRepository.save(question.get());
+            model.addAttribute("question", question);
+            return "question.html";
+        }
+
+        return "ask-a-question.html";
     }
 
     /**

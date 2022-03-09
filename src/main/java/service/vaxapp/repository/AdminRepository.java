@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import service.vaxapp.model.Admin;
 
 @Repository
-public interface AdminRepository extends JpaRepository<Admin, Integer> {
+public interface AdminRepository extends JpaRepository<Admin, String> {
 }

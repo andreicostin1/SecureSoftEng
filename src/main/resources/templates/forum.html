@@ -100,7 +100,7 @@
                       <span class="text-muted">&nbsp;&nbsp;<small th:text="${question.dateSubmitted}"></small></span>
                     </h6>
                   </div>
-                  <a th:href="@{/question(id=${question.id})}" th:text="${#lists.size(question.answers)} answer"></a>
+                  <a th:href="@{/question(id=${question.id})}" th:text="${#lists.size(question.answers)} answers"></a>
                 </div>
               </div>
             </div>
