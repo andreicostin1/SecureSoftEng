@@ -4,83 +4,82 @@
 <head th:insert="fragments/head :: head"></head>
 
 <body class="index-page">
-    <div th:replace="fragments/navbar:: navbar"></div>
+<div th:replace="fragments/navbar:: navbar"></div>
 
-    <div class="wrapper">
-        <section class="section section-hero section-shaped">
-            <div class="shape shape-style-1 shape-default">
-                <span class="span-150"></span>
-                <span class="span-50"></span>
-                <span class="span-50"></span>
-                <span class="span-75"></span>
-                <span class="span-100"></span>
-                <span class="span-75"></span>
-                <span class="span-50"></span>
-                <span class="span-100"></span>
-                <span class="span-50"></span>
-                <span class="span-100"></span>
-            </div>
-            <div class="page-header">
-                <div class="container shape-container d-flex align-items-center py-lg">
-                    <div class="col px-0">
-                        <div class="row align-items-center justify-content-center">
-                            <div class="col-lg-7">
-                                <img src="/images/title.svg" style="width: 100%" class="img-fluid" />
-                                <p class="lead text-white text-center">Set up an appointment to get your COVID-19
-                                    vaccine!</p>
+<div class="wrapper">
+    <section class="section section-hero section-shaped">
+        <div class="shape shape-style-1 shape-default">
+            <span class="span-150"></span>
+            <span class="span-50"></span>
+            <span class="span-50"></span>
+            <span class="span-75"></span>
+            <span class="span-100"></span>
+            <span class="span-75"></span>
+            <span class="span-50"></span>
+            <span class="span-100"></span>
+            <span class="span-50"></span>
+            <span class="span-100"></span>
+        </div>
+        <div class="page-header">
+            <div class="container shape-container d-flex align-items-center py-lg">
+                <div class="col px-0">
+                    <div class="col-lg-7">
+                        <img src="/images/title.svg" style="width: 100%" class="img-fluid"/>
+                        <p class="lead text-white text-center">Set up an appointment to get your COVID-19
+                            vaccine!</p>
 
-                                <form id="appointment-form" class="mt-5 mx-auto" action="make-appointment"
-                                    method="POST">
-                                    <span class="text-white">Choose a vaccination center:</span>
-                                    <select class="form-control mt-1 mb-3 border-0" name="center">
-                                        <option>RDS Vaccination Center</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                    </select>
-                                    <span class="text-white">Select the perfect day:</span>
-                                    <select class="form-control mt-1 mb-3 border-0" name="date">
-                                        <option>Monday, 28.02.2022</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                    </select>
-                                    <span class="text-white">Pick the right time slot:</span>
-                                    <select class="form-control mt-1 mb-3 border-0" name="timeslot">
-                                        <option>11:30am - 11:45am</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                    </select>
+                        <form id="appointment-form" class="mt-5 mx-auto" action="make-appointment"
+                              method="POST">
+                            <span class="text-white">Choose a vaccination center:</span>
+                            <select class="form-control mt-1 mb-3 border-0" name="center">
+                                <option>RDS Vaccination Center</option>
+                                <option>2</option>
+                                <option>3</option>
+                            </select>
+                            <span class="text-white">Select the perfect day:</span>
+                            <select class="form-control mt-1 mb-3 border-0" name="date">
+                                <option>Monday, 28.02.2022</option>
+                                <option>2</option>
+                                <option>3</option>
+                            </select>
+                            <span class="text-white">Pick the right time slot:</span>
+                            <select class="form-control mt-1 mb-3 border-0" name="timeslot">
+                                <option>11:30am - 11:45am</option>
+                                <option>2</option>
+                                <option>3</option>
+                            </select>
 
-                                    <div class="text-center mt-4">
-                                        <a href="" target="_blank" rel="noopener"
-                                            class="btn btn-neutral-outline btn-success btn-icon">
-                                            <span class="btn-inner--icon"><i class="fa fa-calendar mr-2"></i></span>
-                                            Make appointment
-                                        </a>
-                                    </div>
-                                </form>
+                            <div class="text-center mt-4">
+                                <a href="" target="_blank" rel="noopener"
+                                   class="btn btn-neutral-outline btn-success btn-icon">
+                                    <span class="btn-inner--icon"><i class="fa fa-calendar mr-2"></i></span>
+                                    Make appointment
+                                </a>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        </section>
-        <footer th:insert="fragments/footer :: footer"></footer>
-    </div>
-    <script type="text/javascript">
-        $(function () {
-            $(".birth-datepicker").datepicker({
-                format: "dd/mm/yyyy",
-                endDate: "-18y",
-            });
-
-            $(".vaccine-datepicker").datepicker({
-                format: "dd/mm/yyyy",
-                endDate: "-18y",
-            });
-
-            $('[data-toggle="tooltip"]').tooltip();
+        </div>
+</div>
+</section>
+<footer th:insert="fragments/footer :: footer"></footer>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(".birth-datepicker").datepicker({
+            format: "dd/mm/yyyy",
+            endDate: "-18y",
         });
-    </script>
+
+        $(".vaccine-datepicker").datepicker({
+            format: "dd/mm/yyyy",
+            endDate: "-18y",
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
 </body>
 
 </html>
