@@ -85,6 +85,8 @@ public class AppController {
         model.addAttribute("totalDoses", vaccineRepository.count());
         model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
         model.addAttribute("country", "Ireland");
+        model.addAttribute("maleDosePercent", "50%");
+        model.addAttribute("femaleDosePercent", "50%");
         return "stats.html";
     }
 
