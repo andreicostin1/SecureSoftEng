@@ -68,8 +68,7 @@ public class AppController {
             return "redirect:/";
         }
 
-        Appointment app = new Appointment(appSlot.getVaccineCentre(), appSlot.getDate(), appSlot.getStartTime(),
-                userSession.getUser(), "pending");
+        Appointment app = new Appointment(appSlot.getVaccineCentre(), appSlot.getDate(), appSlot.getStartTime(), userSession.getUser(), "pending");
         appointmentRepository.save(app);
         appointmentSlotRepository.delete(appSlot);
 
@@ -102,8 +101,8 @@ public class AppController {
             }
         }
 
-        model.addAttribute("maleDosePercent", male/userRepository.count());
-        model.addAttribute("femaleDosePercent", female/userRepository.count());
+        model.addAttribute("maleDosePercent", male / userRepository.count());
+        model.addAttribute("femaleDosePercent", female / userRepository.count());
     }
 
     @PostMapping("/stats")
