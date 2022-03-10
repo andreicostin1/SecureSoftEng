@@ -76,10 +76,8 @@ public class AppController {
 
     @GetMapping("/stats")
     public String statistics(Model model) {
-        //if (!userSession.isLoggedIn()) return "redirect:/login";
-        //if (!userSession.getUser().isAdmin()) return "redirect:/";
+        if (!userSession.isLoggedIn()) return "redirect:/login";
 
-        // TODO - add DB retrieval logic + authorization check
         model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
         model.addAttribute("country", "Irish");
         getStats(model);
@@ -107,6 +105,8 @@ public class AppController {
 
     @PostMapping("/stats")
     public String statistics(Model model, @RequestParam("nationality") String country) {
+        if (!userSession.isLoggedIn()) return "redirect:/login";
+
         model.addAttribute("dosesByNationality", userRepository.countByNationality(country).size());
         model.addAttribute("country", country);
         getStats(model);
