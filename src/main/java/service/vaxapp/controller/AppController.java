@@ -14,10 +14,7 @@ import service.vaxapp.repository.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @Controller
@@ -81,15 +78,15 @@ public class AppController {
         //if (!userSession.getUser().isAdmin()) return "redirect:/";
 
         // TODO - add DB retrieval logic + authorization check
-        model.addAttribute("userSession", userSession);
-        model.addAttribute("totalDoses", vaccineRepository.count());
         model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
         model.addAttribute("country", "Ireland");
-        getVaccineStatsByGender(model);
+        getStats(model);
         return "stats.html";
     }
 
-    private void getVaccineStatsByGender(Model model) {
+    private void getStats(Model model) {
+        model.addAttribute("userSession", userSession);
+        model.addAttribute("totalDoses", vaccineRepository.count());
         int male = 0;
         int female = 0;
 
@@ -107,11 +104,9 @@ public class AppController {
 
     @PostMapping("/stats")
     public String statistics(Model model, @RequestParam("nationality") String country) {
-        model.addAttribute("userSession", userSession);
-        model.addAttribute("totalDoses", vaccineRepository.count());
         model.addAttribute("dosesByNationality", userRepository.countByNationality(country).size());
         model.addAttribute("country", country);
-        getVaccineStatsByGender(model);
+        getStats(model);
         return "stats.html";
     }
 
