@@ -1,16 +1,15 @@
 package service.vaxapp.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import service.vaxapp.UserSession;
 import service.vaxapp.model.User;
 import service.vaxapp.repository.*;
+
+import java.util.Optional;
 
 @Controller
 public class AppController {
@@ -30,7 +29,7 @@ public class AppController {
     private VaccineTypeRepository vaccineTypeRepository;
 
     @Autowired
-	private UserSession userSession;
+    private UserSession userSession;
 
     @GetMapping("/")
     public String index(Model model) {
@@ -39,21 +38,21 @@ public class AppController {
         return "index.html";
     }
 
-    @GetMapping("/statistics")
+    @GetMapping("/stats")
     public String statistics(Model model) {
-        if (!userSession.isLoggedIn()) return "redirect:/login";
-        if (!userSession.getUser().isAdmin()) return "redirect:/";
+        //if (!userSession.isLoggedIn()) return "redirect:/login";
+        //if (!userSession.getUser().isAdmin()) return "redirect:/";
 
         // TODO - add DB retrieval logic + authorization check
         model.addAttribute("userSession", userSession);
-        return "statistics.html";
+        return "stats.html";
     }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         if (!userSession.isLoggedIn()) return "redirect:/login";
         if (!userSession.getUser().isAdmin()) return "redirect:/";
-        
+
         model.addAttribute("userSession", userSession);
         return "dashboard.html";
     }
@@ -96,10 +95,10 @@ public class AppController {
     }
 
     @GetMapping("/logout")
-	public String logout() {
-		userSession.setUserId(null);
-		return "redirect:/";
-	}
+    public String logout() {
+        userSession.setUserId(null);
+        return "redirect:/";
+    }
 
     @GetMapping("/forum")
     public String forum(Model model) {
@@ -129,11 +128,11 @@ public class AppController {
     @GetMapping("/profile/{stringId}")
     public String profile(@PathVariable String stringId, Model model) {
         if (stringId == null) return "404";
-        
+
         try {
             Integer id = Integer.valueOf(stringId);
             Optional<User> user = userRepository.findById(id);
-            
+
             if (!user.isPresent()) {
                 return "404";
             }
@@ -141,8 +140,7 @@ public class AppController {
             model.addAttribute("userSession", userSession);
             model.addAttribute("profile", user.get());
             return "profile";
-        }
-        catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             return "404";
         }
     }

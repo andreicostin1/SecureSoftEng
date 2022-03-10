@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="fragments/head :: head"></head>
+
+<body class="stats-page">
+<div th:replace="fragments/navbar:: navbar"></div>
+
+<div class="wrapper">
+    <section class="section section-hero section-shaped">
+        <div class="shape shape-style-1 shape-default">
+            <span class="span-150"></span>
+            <span class="span-50"></span>
+            <span class="span-50"></span>
+            <span class="span-75"></span>
+            <span class="span-100"></span>
+            <span class="span-75"></span>
+            <span class="span-50"></span>
+            <span class="span-100"></span>
+            <span class="span-50"></span>
+            <span class="span-100"></span>
+        </div>
+    </section>
+    <footer th:insert="fragments/footer :: footer"></footer>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(".birth-datepicker").datepicker({
+            format: "dd/mm/yyyy",
+            endDate: "-18y",
+        });
+
+        $(".vaccine-datepicker").datepicker({
+            format: "dd/mm/yyyy",
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+</body>
+</html>
