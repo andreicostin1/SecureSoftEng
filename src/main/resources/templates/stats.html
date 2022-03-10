@@ -226,10 +226,15 @@
                     Submit
                 </button>
             </form>
-            <h2 th:text="${dosesByNationality} + ' people from ' + ${country} + ' have been vaccinated'"></h2>
+            <h2 th:text="${dosesByNationality} + ' ' + ${country} + ' people have been vaccinated'"></h2>
             <h2 th:text="${maleDosePercent} + '% of vaccinated people are male'"></h2>
             <h2 th:text="${femaleDosePercent} + '% of vaccinated people are female'"></h2>
 
+            <table>
+                <tr th:each="ages : ${agerange}">
+                    <td th:text="${ages.key} + ': ' + ${ages.value} + '%'"
+                </tr>
+            </table>
         </div>
     </section>
     <footer th:insert="fragments/footer :: footer"></footer>

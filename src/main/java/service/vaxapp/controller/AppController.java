@@ -15,6 +15,8 @@ import service.vaxapp.repository.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -79,7 +81,7 @@ public class AppController {
 
         // TODO - add DB retrieval logic + authorization check
         model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
-        model.addAttribute("country", "Ireland");
+        model.addAttribute("country", "Irish");
         getStats(model);
         return "stats.html";
     }
@@ -87,17 +89,18 @@ public class AppController {
     private void getStats(Model model) {
         model.addAttribute("userSession", userSession);
         model.addAttribute("totalDoses", vaccineRepository.count());
-        int male = 0;
-        int female = 0;
+        List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
+        long male = users.stream().filter(x -> x.getGender().equals("male")).count();
+        long female = users.size() - male;
+        Map<Integer, Long> ageRanges = new TreeMap<>();
 
-        for (Vaccine v : vaccineRepository.findAll()) {
-            if (v.getUser().getGender() == "male") {
-                male++;
-            } else {
-                female++;
-            }
+        for (AtomicInteger i = new AtomicInteger(0); i.get() <= 8; i.incrementAndGet()) {
+            ageRanges.put(i.get() * 10, users.stream().filter(x -> x.getAge() / 10 == i.get()).count());
         }
 
+        ageRanges.forEach((k, v) -> v = v / userRepository.count());
+
+        model.addAttribute("agerange", ageRanges);
         model.addAttribute("maleDosePercent", male / userRepository.count());
         model.addAttribute("femaleDosePercent", female / userRepository.count());
     }
