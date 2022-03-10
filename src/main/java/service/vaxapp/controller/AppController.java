@@ -1,12 +1,5 @@
 package service.vaxapp.controller;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -16,7 +9,14 @@ import service.vaxapp.UserSession;
 import service.vaxapp.model.Appointment;
 import service.vaxapp.model.AppointmentSlot;
 import service.vaxapp.model.User;
+import service.vaxapp.model.Vaccine;
 import service.vaxapp.repository.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -67,8 +67,7 @@ public class AppController {
             return "redirect:/";
         }
 
-        Appointment app = new Appointment(appSlot.getVaccineCentre(), appSlot.getDate(), appSlot.getStartTime(),
-                userSession.getUser(), "pending");
+        Appointment app = new Appointment(appSlot.getVaccineCentre(), appSlot.getDate(), appSlot.getStartTime(), userSession.getUser(), "pending");
         appointmentRepository.save(app);
         appointmentSlotRepository.delete(appSlot);
 
@@ -81,21 +80,36 @@ public class AppController {
         //if (!userSession.getUser().isAdmin()) return "redirect:/";
 
         // TODO - add DB retrieval logic + authorization check
+        model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
+        model.addAttribute("country", "Irish");
+        getStats(model);
+        return "stats.html";
+    }
+
+    private void getStats(Model model) {
         model.addAttribute("userSession", userSession);
         model.addAttribute("totalDoses", vaccineRepository.count());
-        model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
-        model.addAttribute("country", "Ireland");
-        model.addAttribute("maleDosePercent", "50%");
-        model.addAttribute("femaleDosePercent", "50%");
-        return "stats.html";
+        List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
+        long male = users.stream().filter(x -> x.getGender().equals("male")).count();
+        long female = users.size() - male;
+        Map<Integer, Long> ageRanges = new TreeMap<>();
+
+        for (AtomicInteger i = new AtomicInteger(0); i.get() <= 8; i.incrementAndGet()) {
+            ageRanges.put(i.get() * 10, users.stream().filter(x -> x.getAge() / 10 == i.get()).count());
+        }
+
+        ageRanges.forEach((k, v) -> v = v / userRepository.count());
+
+        model.addAttribute("agerange", ageRanges);
+        model.addAttribute("maleDosePercent", male / userRepository.count());
+        model.addAttribute("femaleDosePercent", female / userRepository.count());
     }
 
     @PostMapping("/stats")
     public String statistics(Model model, @RequestParam("nationality") String country) {
-        model.addAttribute("userSession", userSession);
-        model.addAttribute("totalDoses", vaccineRepository.count());
         model.addAttribute("dosesByNationality", userRepository.countByNationality(country).size());
         model.addAttribute("country", country);
+        getStats(model);
         return "stats.html";
     }
 
