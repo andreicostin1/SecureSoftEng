@@ -1,12 +1,5 @@
 package service.vaxapp.controller;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -16,7 +9,15 @@ import service.vaxapp.UserSession;
 import service.vaxapp.model.Appointment;
 import service.vaxapp.model.AppointmentSlot;
 import service.vaxapp.model.User;
+import service.vaxapp.model.Vaccine;
 import service.vaxapp.repository.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 @Controller
@@ -85,9 +86,24 @@ public class AppController {
         model.addAttribute("totalDoses", vaccineRepository.count());
         model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
         model.addAttribute("country", "Ireland");
-        model.addAttribute("maleDosePercent", "50%");
-        model.addAttribute("femaleDosePercent", "50%");
+        getVaccineStatsByGender(model);
         return "stats.html";
+    }
+
+    private void getVaccineStatsByGender(Model model) {
+        int male = 0;
+        int female = 0;
+
+        for (Vaccine v : vaccineRepository.findAll()) {
+            if (v.getUser().getGender() == "male") {
+                male++;
+            } else {
+                female++;
+            }
+        }
+
+        model.addAttribute("maleDosePercent", male/userRepository.count());
+        model.addAttribute("femaleDosePercent", female/userRepository.count());
     }
 
     @PostMapping("/stats")
@@ -96,6 +112,7 @@ public class AppController {
         model.addAttribute("totalDoses", vaccineRepository.count());
         model.addAttribute("dosesByNationality", userRepository.countByNationality(country).size());
         model.addAttribute("country", country);
+        getVaccineStatsByGender(model);
         return "stats.html";
     }
 
