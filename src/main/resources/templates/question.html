@@ -13,7 +13,7 @@
             <h6 class="question-details mb-3">
               <a
                 th:href="@{/profile(id=${question.getUser().id})}"
-                th:text="@${question.getUser().fullName}"
+                th:text="'@' + ${question.getUser().fullName}"
               ></a>
               <span class="text-muted">&nbsp;&nbsp;<small th:text="${question.dateSubmitted}"></small></span>
             </h6>

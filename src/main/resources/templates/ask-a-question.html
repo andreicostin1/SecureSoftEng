@@ -1,40 +1,80 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+  <head th:insert="fragments/head :: head"></head>
+  <head>
+    <script>
+      window.onload = () => {
+        document.getElementById("questionSubmitForm").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const title = document.getElementById("title").value;
+          const details = document.getElementById("details").value;
+          const currentDate = new Date();
+          const year = currentDate.getFullYear();
+          let month = currentDate.getMonth() + 1;
+          let day = currentDate.getDate();
+          if (day < 10) day = "0" + day;
+          if (month < 10) month = "0" + month;
+          console.log("TITLE: ", title, ", DETAILS: ", details, ", DATE: ", day, "/", month, "/", "year");
+          await fetch("/ask-a-question", {
+            method: "POST",
+            body: JSON.stringify({
+              title: `${title}`,
+              details: `${details}`,
+              dateSubmitted: `${day}/${month}/${year}}`,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }).then((res) => {
+            (window.location.href = `/question?id=${res.id}`), true;
+          });
+        });
+      };
+    </script>
+  </head>
 
-<head th:insert="fragments/head :: head"></head>
-
-<body class="index-page">
+  <body class="index-page">
     <div th:replace="fragments/navbar:: navbar"></div>
 
     <div class="wrapper">
-        <div class="section section-shaped bg-secondary">
-            <div class="navbar-background"></div>
-            <div class="page-header">
-                <div class="container shape-container py-lg">
-                    <div class="card mt-3 shadow" style="width: 100%">
-                        <div class="card-body p-5">
-                            <h4 class="card-title">Ask away!</h4>
-                            <h6 class="card-subtitle mb-4 text-muted">
-                                Our staff is here 24/7 to make sure you have all the facts!
-                            </h6>
+      <div class="section section-shaped bg-secondary">
+        <div class="navbar-background"></div>
+        <div class="page-header">
+          <div class="container shape-container py-lg">
+            <div class="card mt-3 shadow" style="width: 100%">
+              <div class="card-body p-5">
+                <h4 class="card-title">Ask away!</h4>
+                <h6 class="card-subtitle mb-4 text-muted">
+                  Our staff is here 24/7 to make sure you have all the facts!
+                </h6>
 
-                            <form action="/ask-a-question" method="POST">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" name="question" placeholder="Question" />
-                                </div>
-                                <div class="form-group">
-                                    <textarea class="form-control" rows="3" name="details"
-                                        placeholder="Optional: you can provide more details here"></textarea>
-                                </div>
-                                <button class="btn btn-primary" type="submit">I wanna know!</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                <form method="POST" id="questionSubmitForm">
+                  <div class="form-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="question"
+                      placeholder="Question"
+                      id="title"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <textarea
+                      id="details"
+                      class="form-control"
+                      rows="3"
+                      name="details"
+                      placeholder="Optional: you can provide more details here"
+                    ></textarea>
+                  </div>
+                  <button class="btn btn-primary" type="submit">I wanna know!</button>
+                </form>
+              </div>
             </div>
+          </div>
         </div>
-        <footer th:insert="fragments/footer :: footer"></footer>
+      </div>
+      <footer th:insert="fragments/footer :: footer"></footer>
     </div>
-</body>
-
+  </body>
 </html>

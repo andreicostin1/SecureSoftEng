@@ -24,12 +24,12 @@
                 <div class="row align-items-center">
                   <div class="mr-auto">
                     <a th:href="@{/question(id=${question.id})}">
-                      <h5 class="card-title mb-3" th:text="${question.body}"></h5>
+                      <h5 class="card-title mb-3" th:text="${question.details}"></h5>
                     </a>
                     <h6 class="card-subtitle mb-0">
                       <a
                         th:href="@{/profile(id=${question.getUser().PPS})}"
-                        th:text="@${question.getUser().fullName}"
+                        th:text="'@' + ${question.getUser().fullName}"
                       ></a>
                       <span class="text-muted"
                         >&nbsp;&nbsp;<small th:text="${question.dateSubmitted}"></small
@@ -38,7 +38,7 @@
                   </div>
                   <a
                     th:href="@{/question(id=${question.id})}"
-                    th:text="${#lists.size(question.answers)} answers"
+                    th:text="${#lists.size(question.answers)} + ' answers'"
                   ></a>
                 </div>
               </div>

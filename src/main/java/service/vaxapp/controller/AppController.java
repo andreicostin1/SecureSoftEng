@@ -132,29 +132,27 @@ public class AppController {
         // TODO
         // If admin, return to index page
         // If user, return ask a question page
+        model.addAttribute("userSession", userSession);
         return "ask-a-question.html";
     }
 
     @PostMapping("/ask-a-question")
     @ResponseBody
-    public String askAQuestion(@RequestBody Question question, Model model) {
-        // Retrieve user account
-        // TODO: retrieve user info from session instead
-        // If user is logged in, allow question
-        // Otherwise do not allow question
-        User user = userRepository.findByPPS("1234567A");
-        if (user != null) {
-            ForumQuestion newQuestion = new ForumQuestion(question.title, question.details, question.dateSubmitted);
-            newQuestion.setUser(user);
-            // Add question to database
-            forumQuestionRepository.save(newQuestion);
-            model.addAttribute("question", newQuestion);
-            return "question.html";
+    public Integer askAQuestion(@RequestBody Question question, Model model) {
+        // User not logged in || User is Admin
+        if (!userSession.isLoggedIn() || userSession.getUser().isAdmin()) {
+            return null;
         }
 
-        // TODO - add DB retrieval logic + authorization check
-        model.addAttribute("userSession", userSession);
-        return "ask-a-question.html";
+        // Create new question entry in db
+        ForumQuestion newQuestion = new ForumQuestion(question.title, question.details, question.dateSubmitted);
+        newQuestion.setUser(userSession.getUser());
+
+        // Add question to database
+        forumQuestionRepository.save(newQuestion);
+
+        // Return new question
+        return newQuestion.getId();
     }
 
     @GetMapping("/profile")
@@ -189,26 +187,16 @@ public class AppController {
         }
     }
 
-    // @GetMapping("/question")
-    // public String getQuestionById(@RequestParam(name = "id") Integer id, Model
-    // model) {
-    // // TODO
-    // // Retrieve session info on user
-    // // STEP 3. If user, return question without answer functionality
-    // // STEP 3. If admin, return question with answer functionality
-    // Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
-    // if (question.isPresent()) {
-    // model.addAttribute("question", question);
-    // return "question.html";
-    // }
-    // return "redirect:/forum";
-    // }
-
     @GetMapping("/question")
-    public String question(Model model) {
-        // TODO - add DB retrieval logic + authorization check + question id
-        model.addAttribute("userSession", userSession);
-        return "question.html";
+    public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
+        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
+        if (question.isPresent()) {
+            model.addAttribute("question", question.get());
+            model.addAttribute("userSession", userSession);
+            return "question.html";
+        } else {
+            return "redirect:/forum";
+        }
     }
 
     // @PostMapping("/question")
