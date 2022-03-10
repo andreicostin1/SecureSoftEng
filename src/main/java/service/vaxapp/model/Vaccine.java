@@ -4,40 +4,37 @@ import java.time.LocalDate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Vaccine {
-    @EmbeddedId
-    private VaccineId vaccineId;
+    @Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
     @ManyToOne
-    @MapsId("user_pps")
+    @MapsId("id")
     private User user;
 
     @Column(name = "date_received")
     private LocalDate dateReceived;
 
-    // Unidirectional one-to-one relationship (One vaccine may be of one vaccine
-    // type)
-    @OneToOne(targetEntity = VaccineType.class, cascade = CascadeType.ALL)
-    private VaccineType vaccineType;
-
-    // Unidirectional one-to-one relationship (One vaccine may be given at one
+    // many-to-one relationship (Many vaccines may be given at one
     // vaccine centre)
-    @OneToOne(targetEntity = VaccineCentre.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = VaccineCentre.class, cascade = CascadeType.ALL)
     private VaccineCentre vaccineCentre;
 
     // Bidirectional many-to-one relationship (Many vaccines may be assigned by one
     // admin)
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_pps")
+    @JoinColumn(name = "id")
     private User admin;
 
     public Vaccine() {
@@ -47,28 +44,12 @@ public class Vaccine {
         this.dateReceived = dateReceived;
     }
 
-    public VaccineId getVaccineId() {
-        return vaccineId;
-    }
-
-    public void setVaccineId(VaccineId vaccineId) {
-        this.vaccineId = vaccineId;
-    }
-
     public User getAdmin() {
         return admin;
     }
 
     public void setAdmin(User admin) {
-        this.user = admin;
-    }
-
-    public VaccineType getVaccineType() {
-        return vaccineType;
-    }
-
-    public void setVaccineType(VaccineType vaccineType) {
-        this.vaccineType = vaccineType;
+        this.admin = admin;
     }
 
     public VaccineCentre getVaccineCentre() {

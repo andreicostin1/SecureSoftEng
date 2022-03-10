@@ -15,8 +15,6 @@ public class VaccineCentre {
     private Integer id;
     @Column
     private String name;
-    @Column
-    private String address;
 
     public VaccineCentre() {
     }
@@ -35,13 +33,5 @@ public class VaccineCentre {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 }
