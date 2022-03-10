@@ -2,82 +2,8 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
   <head th:insert="fragments/head :: head"> </head>
   <body class="index-page">
-    <!-- Navbar -->
-    <nav id="navbar-main" class="navbar navbar-main navbar-expand-lg navbar-light navbar-transparent top-0 py-3">
-      <div class="container">
-        <a class="navbar-brand mr-lg-5" href="/">
-          <img src="/images/logo.svg" />
-        </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbar_global"
-          aria-controls="navbar_global"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-collapse collapse" id="navbar_global">
-          <div class="navbar-collapse-header">
-            <div class="row">
-              <div class="col-6 collapse-brand">
-                <a href="/">
-                  <img src="/images/logo.svg" />
-                </a>
-              </div>
-              <div class="col-6 collapse-close">
-                <button
-                  type="button"
-                  class="navbar-toggler"
-                  data-toggle="collapse"
-                  data-target="#navbar_global"
-                  aria-controls="navbar_global"
-                  aria-expanded="false"
-                  aria-label="Toggle navigation"
-                >
-                  <span></span>
-                  <span></span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
-            <li class="nav-item">
-              <a href="/" class="nav-link" role="button">
-                <span class="nav-link-inner--text">Home</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/forum" class="nav-link" role="button">
-                <span class="nav-link-inner--text">Ask a question</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/stats" class="nav-link" role="button">
-                <span class="nav-link-inner--text">Statistics</span>
-              </a>
-            </li>
-          </ul>
-          <ul class="navbar-nav align-items-lg-center ml-lg-auto">
-            <li class="nav-item d-none d-lg-block ml-lg-4">
-              <a href="/login" rel="noopener" class="btn btn-neutral btn-icon">
-                <span class="btn-inner--icon"><i class="fa fa-user mr-2"></i></span>
-                <span class="nav-link-inner--text">Sign in</span>
-              </a>
-            </li>
-            <li class="nav-item d-none d-lg-block">
-              <a href="/register" rel="noopener" class="btn btn-neutral-outline btn-success btn-icon">
-                <span class="btn-inner--icon"><i class="fa fa-plus mr-2"></i></span>
-                <span class="nav-link-inner--text">Create account</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <!-- End Navbar -->
+    <div th:replace="fragments/navbar:: navbar"></div>
+
     <div class="wrapper">
       <div class="section section-shaped bg-secondary">
         <div class="navbar-background"></div>
@@ -87,8 +13,13 @@
               <h3 class="mb-0 mr-auto">Asked questions</h3>
               <a href="/ask-a-question" class="btn btn-primary"> Ask a question </a>
             </div>
-  
-            <div th:each="question : ${questions}" th:id="${question.id}" class="card mt-3 shadow-sm" style="width: 100%">
+
+            <div
+              th:each="question : ${questions}"
+              th:id="${question.id}"
+              class="card mt-3 shadow-sm"
+              style="width: 100%"
+            >
               <div class="card-body py-3 px-5">
                 <div class="row align-items-center">
                   <div class="mr-auto">
@@ -96,17 +27,26 @@
                       <h5 class="card-title mb-3" th:text="${question.body}"></h5>
                     </a>
                     <h6 class="card-subtitle mb-0">
-                      <a th:href="@{/profile(id=${question.getUser().PPS})}" th:text="@${question.getUser().fullName}"></a>
-                      <span class="text-muted">&nbsp;&nbsp;<small th:text="${question.dateSubmitted}"></small></span>
+                      <a
+                        th:href="@{/profile(id=${question.getUser().PPS})}"
+                        th:text="@${question.getUser().fullName}"
+                      ></a>
+                      <span class="text-muted"
+                        >&nbsp;&nbsp;<small th:text="${question.dateSubmitted}"></small
+                      ></span>
                     </h6>
                   </div>
-                  <a th:href="@{/question(id=${question.id})}" th:text="${#lists.size(question.answers)} answers"></a>
+                  <a
+                    th:href="@{/question(id=${question.id})}"
+                    th:text="${#lists.size(question.answers)} answers"
+                  ></a>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <footer th:insert="fragments/footer :: footer" ></footer>
       </div>
+      <footer th:insert="fragments/footer :: footer"></footer>
+    </div>
   </body>
 </html>
