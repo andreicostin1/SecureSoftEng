@@ -41,6 +41,9 @@ public class AppController {
 
     @GetMapping("/statistics")
     public String statistics(Model model) {
+        if (!userSession.isLoggedIn()) return "redirect:/login";
+        if (!userSession.getUser().isAdmin()) return "redirect:/";
+
         // TODO - add DB retrieval logic + authorization check
         model.addAttribute("userSession", userSession);
         return "statistics.html";
