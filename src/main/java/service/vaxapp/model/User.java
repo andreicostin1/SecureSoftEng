@@ -4,6 +4,8 @@ import javax.persistence.*;
 
 import org.hibernate.annotations.Type;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 @Entity
@@ -112,6 +114,12 @@ public class User {
 
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public int getAge() {
+        // LocalDate birthday = LocalDate.parse(this.dateOfBirth);
+        // return Period.between(birthday, LocalDate.now()).getYears();
+        return 20;
     }
 
     public String getNationality() {

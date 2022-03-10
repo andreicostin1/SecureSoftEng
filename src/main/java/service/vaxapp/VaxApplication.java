@@ -3,8 +3,18 @@ package service.vaxapp;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+
+import service.vaxapp.model.AppointmentSlot;
+import service.vaxapp.model.User;
+import service.vaxapp.model.VaccineCentre;
+import service.vaxapp.repository.AppointmentRepository;
+import service.vaxapp.repository.AppointmentSlotRepository;
+import service.vaxapp.repository.UserRepository;
+import service.vaxapp.repository.VaccineCentreRepository;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @SpringBootApplication
 public class VaxApplication {
@@ -13,10 +23,37 @@ public class VaxApplication {
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
+    public CommandLineRunner commandLineRunner(VaccineCentreRepository vaccineCentreRepo, AppointmentSlotRepository appointmentSlotRepo, UserRepository userRepo, AppointmentRepository appointmentRepo) {
         return args -> {
-            // TODO - add any initial app setup
-            System.out.println("Application started");
+            System.out.println("VaxApp started");
+
+            appointmentSlotRepo.deleteAll();
+            appointmentRepo.deleteAll();
+            vaccineCentreRepo.deleteAll();
+            userRepo.deleteAll();
+
+            User admin = new User("1234", "Vladolf Putler", "Kremlin", "", "admin@vaxapp.com", "1952-10-7", "Russian", "Male", true);
+            userRepo.save(admin);
+            
+            VaccineCentre vc1 = new VaccineCentre("RDS Vaccination Centre");
+            VaccineCentre vc2 = new VaccineCentre("UCD Health Centre");
+            vaccineCentreRepo.save(vc1);
+            vaccineCentreRepo.save(vc2);
+
+            AppointmentSlot as1 = new AppointmentSlot(vc1, LocalDate.of(2022, 4, 1), LocalTime.of(9, 0));
+            AppointmentSlot as2 = new AppointmentSlot(vc1, LocalDate.of(2022, 4, 2), LocalTime.of(9, 15));
+            AppointmentSlot as3 = new AppointmentSlot(vc1, LocalDate.of(2022, 4, 3), LocalTime.of(9, 30));
+
+            AppointmentSlot as4 = new AppointmentSlot(vc2, LocalDate.of(2022, 4, 1), LocalTime.of(9, 0));
+            AppointmentSlot as5 = new AppointmentSlot(vc2, LocalDate.of(2022, 4, 2), LocalTime.of(9, 15));
+            AppointmentSlot as6 = new AppointmentSlot(vc2, LocalDate.of(2022, 4, 3), LocalTime.of(9, 30));
+
+            appointmentSlotRepo.save(as1);
+            appointmentSlotRepo.save(as2);
+            appointmentSlotRepo.save(as3);
+            appointmentSlotRepo.save(as4);
+            appointmentSlotRepo.save(as5);
+            appointmentSlotRepo.save(as6);
         };
     }
 }

@@ -4,82 +4,120 @@
 <head th:insert="fragments/head :: head"></head>
 
 <body class="index-page">
-<div th:replace="fragments/navbar:: navbar"></div>
+    <div th:replace="fragments/navbar:: navbar"></div>
 
-<div class="wrapper">
-    <section class="section section-hero section-shaped">
-        <div class="shape shape-style-1 shape-default">
-            <span class="span-150"></span>
-            <span class="span-50"></span>
-            <span class="span-50"></span>
-            <span class="span-75"></span>
-            <span class="span-100"></span>
-            <span class="span-75"></span>
-            <span class="span-50"></span>
-            <span class="span-100"></span>
-            <span class="span-50"></span>
-            <span class="span-100"></span>
-        </div>
-        <div class="page-header">
-            <div class="container shape-container d-flex align-items-center py-lg">
-                <div class="col px-0">
-                    <div class="col-lg-7">
-                        <img src="/images/title.svg" style="width: 100%" class="img-fluid"/>
+    <div class="wrapper">
+        <section class="section section-hero section-shaped">
+            <div class="shape shape-style-1 shape-default">
+                <span class="span-150"></span>
+                <span class="span-50"></span>
+                <span class="span-50"></span>
+                <span class="span-75"></span>
+                <span class="span-100"></span>
+                <span class="span-75"></span>
+                <span class="span-50"></span>
+                <span class="span-100"></span>
+                <span class="span-50"></span>
+                <span class="span-100"></span>
+            </div>
+            <div class="page-header">
+                <div class="container shape-container d-flex align-items-center py-lg">
+                    <div class="col-lg-7 mx-auto">
+                        <img src="/images/title.svg" style="width: 100%" class="img-fluid" />
                         <p class="lead text-white text-center">Set up an appointment to get your COVID-19
                             vaccine!</p>
 
-                        <form id="appointment-form" class="mt-5 mx-auto" action="make-appointment"
-                              method="POST">
+                        <form id="appointment-form" class="mt-5 mx-auto" action="make-appointment" method="POST">
                             <span class="text-white">Choose a vaccination center:</span>
-                            <select class="form-control mt-1 mb-3 border-0" name="center">
-                                <option>RDS Vaccination Center</option>
-                                <option>2</option>
-                                <option>3</option>
+                            <select class="form-control mt-1 mb-3 border-0" name="center_id" id="select-center">
                             </select>
                             <span class="text-white">Select the perfect day:</span>
-                            <select class="form-control mt-1 mb-3 border-0" name="date">
-                                <option>Monday, 28.02.2022</option>
-                                <option>2</option>
-                                <option>3</option>
+                            <select class="form-control mt-1 mb-3 border-0" name="date" id="select-date">
                             </select>
                             <span class="text-white">Pick the right time slot:</span>
-                            <select class="form-control mt-1 mb-3 border-0" name="timeslot">
-                                <option>11:30am - 11:45am</option>
-                                <option>2</option>
-                                <option>3</option>
+                            <select class="form-control mt-1 mb-3 border-0" name="time" id="select-time">
                             </select>
 
                             <div class="text-center mt-4">
-                                <a href="" target="_blank" rel="noopener"
-                                   class="btn btn-neutral-outline btn-success btn-icon">
+                                <button type="submit" class="btn btn-neutral-outline btn-success">
                                     <span class="btn-inner--icon"><i class="fa fa-calendar mr-2"></i></span>
                                     Make appointment
-                                </a>
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-        </div>
-</div>
-</section>
-<footer th:insert="fragments/footer :: footer"></footer>
-</div>
-<script type="text/javascript">
-    $(function () {
-        $(".birth-datepicker").datepicker({
-            format: "dd/mm/yyyy",
-            endDate: "-18y",
+        </section>
+        <footer th:insert="fragments/footer :: footer"></footer>
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+            $(".birth-datepicker").datepicker({
+                format: "dd/mm/yyyy",
+                endDate: "-18y",
+            });
+
+            $(".vaccine-datepicker").datepicker({
+                format: "dd/mm/yyyy",
+                endDate: "-18y",
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const appSlots = /*[[${appSlots}]]*/ null;
+        /*]]>*/
+
+        const vaxCenters = new Set();
+
+        const selectCenter = document.getElementById('select-center');
+        const selectDate = document.getElementById('select-date');
+        const selectTime = document.getElementById('select-time');
+
+        for (let i = 0; i < appSlots.length; i++) {
+            const vaccineCenter = appSlots[i].vaccineCentre;
+            if (!vaxCenters.has(vaccineCenter.id)) {
+                vaxCenters.add(vaccineCenter.id);
+
+                const opt = document.createElement('option');
+                opt.value = vaccineCenter.id;
+                opt.innerHTML = vaccineCenter.name;
+                selectCenter.appendChild(opt);
+            }
+        }
+
+        selectCenter.addEventListener('change', (e) => {
+            applySlots(e.target.value);
         });
 
-        $(".vaccine-datepicker").datepicker({
-            format: "dd/mm/yyyy",
-            endDate: "-18y",
-        });
+        function applySlots(centerId) {
+            selectDate.innerHTML = '';
+            selectTime.innerHTML = '';
+            const centerAppSlots = appSlots.filter((slot) => slot.vaccineCentre.id == centerId);
 
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-</script>
+            for (const slot of centerAppSlots) {
+                const opt = document.createElement('option');
+                opt.value = slot.date;
+                opt.innerHTML = slot.date;
+                selectDate.appendChild(opt);
+
+                const endDate = new Date(new Date(slot.date + ' ' + slot.startTime).getTime() + 15 * 60000);
+
+                const opt2 = document.createElement('option');
+                opt2.value = slot.startTime;
+                opt2.innerHTML = slot.startTime.substring(0, slot.startTime.length - 3) + ' - ' + endDate.getHours() + ':' + endDate.getMinutes();
+                selectTime.appendChild(opt2);
+            }
+        }
+
+        applySlots(selectCenter.value);
+    </script>
 </body>
 
 </html>

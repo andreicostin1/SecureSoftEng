@@ -33,15 +33,15 @@
                             <div class="col-lg-4 order-lg-3 text-lg-right align-self-lg-center">
                                 <!-- It's one or the other here (or none), depending on who's viewing the page -->
                                 <div class="card-profile-actions py-4 mt-lg-0 row justify-content-end">
-                                    <button type="button" class="btn btn-default">
+                                    <button th:if="${profile == null}" type="button" class="btn btn-default">
                                         <span class="btn-inner--icon">
                                             <i class="fa fa-sign-out mr-1"></i>
                                         </span>
                                         Log out
                                     </button>
 
-                                    <button type="button" class="btn btn-primary" data-toggle="modal"
-                                        data-target="#exampleModal">
+                                    <button th:if="${userSession.getUser().isAdmin()}" type="button"
+                                        class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                                         <span class="btn-inner--icon">
                                             <i class="fa fa-syringe"></i>
                                         </span>
@@ -67,7 +67,8 @@
                             </div>
                         </div>
                         <div class="text-center mt-5">
-                            <h3>Jessica Jones<span class="font-weight-light">, 27</span></h3>
+                            <h3 th:text="${userSession.getUser().getFullName()}">Jessica Jones, </h3><span
+                                class="font-weight-light" th:text="${userSession.getUser().getAge()}"></span>
                             <div class="h6 font-weight-300"><i class="ni location_pin mr-2"></i>Bucharest, Romania</div>
                         </div>
 

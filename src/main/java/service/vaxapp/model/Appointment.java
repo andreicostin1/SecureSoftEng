@@ -1,6 +1,7 @@
 package service.vaxapp.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -8,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -17,11 +17,14 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "date_and_time")
-    private LocalDateTime dateAndTime;
+    @Column(name = "date")
+    private LocalDate date;
+
+    @Column(name = "time")
+    private LocalTime time;
 
     @Column
-    private String status;
+    private String status; // one of "pending", "cancelled", "done"
 
     // manye-to-one relationship (many appointments can take place in a centre)
     @ManyToOne(targetEntity = VaccineCentre.class, cascade = CascadeType.ALL)
@@ -30,15 +33,16 @@ public class Appointment {
     // Bidirectional many-to-one relationship (A user may have multiple vaccine
     // appointments)
     @ManyToOne
-    @JoinColumn(name = "user_pps", nullable = false)
     private User user;
 
     public Appointment() {
     }
 
-    public Appointment(Integer id, LocalDateTime dateAndTime, String status) {
-        this.id = id;
-        this.dateAndTime = dateAndTime;
+    public Appointment(VaccineCentre vaccineCentre, LocalDate date, LocalTime time, User user, String status) {
+        this.vaccineCentre = vaccineCentre;
+        this.date = date;
+        this.time = time;
+        this.user = user;
         this.status = status;
     }
 
@@ -49,13 +53,21 @@ public class Appointment {
     public void setId(Integer id) {
         this.id = id;
     }
-
-    public LocalDateTime getDateAndTime() {
-        return dateAndTime;
+    
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setDateAndTime(LocalDateTime dateAndTime) {
-        this.dateAndTime = dateAndTime;
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public LocalTime getTime() {
+        return time;
+    }
+
+    public void setTime(LocalTime time) {
+        this.time = time;
     }
 
     public String getStatus() {
