@@ -46,14 +46,18 @@ public class AppController {
         // TODO - add DB retrieval logic + authorization check
         model.addAttribute("userSession", userSession);
         model.addAttribute("totalDoses", vaccineRepository.count());
+        model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
+        model.addAttribute("country", "Ireland");
         return "stats.html";
     }
 
     @PostMapping("/stats")
     public String statistics(Model model, @RequestParam("nationality") String country) {
-        model.addAttribute("dosesByNationality", userRepository.countByNationality(country));
+        model.addAttribute("userSession", userSession);
+        model.addAttribute("totalDoses", vaccineRepository.count());
+        model.addAttribute("dosesByNationality", userRepository.countByNationality(country).size());
         model.addAttribute("country", country);
-        return "redirect:/stats";
+        return "stats.html";
     }
 
     @GetMapping("/dashboard")

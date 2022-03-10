@@ -21,12 +21,11 @@
             <span class="span-100"></span>
         </div>
 
-        <div class="row align-items-center justify-content-center">
-            <h2>Stats</h2>
-            <p th:text="${totalDoses} doses have been administered"></p>
-
-            <form action="stats.html" method="post">
-                <select name="nationality" class="form-control">
+        <div class="align-items-center justify-content-center">
+            <h2>Stats </h2>
+            <h2 th:text="${totalDoses} + ' doses have been administered'"></h2>
+            <form action="stats" method="post">
+                <select name="nationality">
                     <option value="">Nationality</option>
                     <option value="afghan">Afghan</option>
                     <option value="albanian">Albanian</option>
@@ -227,7 +226,8 @@
                     Submit
                 </button>
             </form>
-            <p th:text="${dosesByNationality} doses administered to people from ${country}"></p>
+            <br>
+            <h2 th:text="${dosesByNationality} + ' people from ' + ${country} + ' have been vaccinated'"></h2>
         </div>
     </section>
     <footer th:insert="fragments/footer :: footer"></footer>
