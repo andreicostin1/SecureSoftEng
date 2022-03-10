@@ -25,8 +25,6 @@ public class AppController {
     private VaccineCentreRepository vaccineCentreRepository;
     @Autowired
     private VaccineRepository vaccineRepository;
-    @Autowired
-    private VaccineTypeRepository vaccineTypeRepository;
 
     @Autowired
     private UserSession userSession;

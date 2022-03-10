@@ -20,7 +20,6 @@ public class Vaccine {
 	private Integer id;
 
     @ManyToOne
-    @MapsId("id")
     private User user;
 
     @Column(name = "date_received")
@@ -34,7 +33,6 @@ public class Vaccine {
     // Bidirectional many-to-one relationship (Many vaccines may be assigned by one
     // admin)
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "id")
     private User admin;
 
     public Vaccine() {
