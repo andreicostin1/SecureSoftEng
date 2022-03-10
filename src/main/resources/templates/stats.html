@@ -230,9 +230,10 @@
             <h2 th:text="${maleDosePercent} + '% of vaccinated people are male'"></h2>
             <h2 th:text="${femaleDosePercent} + '% of vaccinated people are female'"></h2>
 
+            <h2>Age Breakdown:</h2>
             <table>
                 <tr th:each="ages : ${agerange}">
-                    <td th:text="${ages.key} + ': ' + ${ages.value} + '%'"
+                    <td th:text="${ages.key} + ': ' + ${ages.value} + '%'"></td>
                 </tr>
             </table>
         </div>
