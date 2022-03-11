@@ -101,11 +101,11 @@ public class AppController {
         model.addAttribute("totalDoses", vaccineRepository.count());
         List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
 
-        model.addAttribute("dosesByNationality", users.stream().peek(x-> System.out.println(x.getNationality())).filter(x -> x.getNationality().equalsIgnoreCase("irish")).count());
+        model.addAttribute("dosesByNationality", users.stream().peek(x -> System.out.println(x.getNationality())).filter(x -> x.getNationality().equalsIgnoreCase("irish")).count());
         model.addAttribute("country", "Irish");
 
         long total = users.size();
-        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("Male")).count();
+        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("male")).count();
         long female = total - male;
         Map<Integer, Double> ageRanges = new TreeMap<>();
 
