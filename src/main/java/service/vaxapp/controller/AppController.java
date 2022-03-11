@@ -1,5 +1,14 @@
 package service.vaxapp.controller;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -12,8 +21,6 @@ import service.vaxapp.model.User;
 import service.vaxapp.model.Vaccine;
 import service.vaxapp.repository.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -42,6 +49,20 @@ public class AppController {
     @GetMapping("/")
     public String index(Model model) {
         ArrayList<AppointmentSlot> appSlots = (ArrayList<AppointmentSlot>) appointmentSlotRepository.findAll();
+
+        // sort time slots by center and date
+        Collections.sort(appSlots, new Comparator<AppointmentSlot>() {
+            public int compare(AppointmentSlot o1, AppointmentSlot o2) {
+                if (o1.getVaccineCentre().getName() == o2.getVaccineCentre().getName()) {
+                    if (o1.getDate() == o2.getDate())
+                        return o1.getStartTime().compareTo(o2.getStartTime());
+                    return o1.getDate().compareTo(o2.getDate());
+                }
+
+                return o1.getVaccineCentre().getName().compareTo(o2.getVaccineCentre().getName());
+            }
+        });
+
         model.addAttribute("appSlots", appSlots);
         model.addAttribute("userSession", userSession);
         return "index";
@@ -76,8 +97,6 @@ public class AppController {
 
     @GetMapping("/stats")
     public String statistics(Model model) {
-        if (!userSession.isLoggedIn()) return "redirect:/login";
-
         model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
         model.addAttribute("country", "Irish");
         getStats(model);
@@ -115,8 +134,10 @@ public class AppController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        if (!userSession.isLoggedIn()) return "redirect:/login";
-        if (!userSession.getUser().isAdmin()) return "redirect:/";
+        if (!userSession.isLoggedIn())
+            return "redirect:/login";
+        if (!userSession.getUser().isAdmin())
+            return "redirect:/";
 
         model.addAttribute("userSession", userSession);
         return "dashboard";
@@ -181,21 +202,23 @@ public class AppController {
 
     @GetMapping("/profile")
     public String profile(Model model) {
-        // TODO - add DB retrieval logic + authorization check
-        if (!userSession.isLoggedIn()) {
+        if (!userSession.isLoggedIn())
             return "redirect:/login";
-        }
 
         List<Appointment> apps = appointmentRepository.findByUser(userSession.getUserId());
+        Collections.reverse(apps);
 
         model.addAttribute("appointments", apps);
         model.addAttribute("userSession", userSession);
+        model.addAttribute("userProfile", userSession.getUser());
+        model.addAttribute("isSelf", true);
         return "profile";
     }
 
     @GetMapping("/profile/{stringId}")
     public String profile(@PathVariable String stringId, Model model) {
-        if (stringId == null) return "404";
+        if (stringId == null)
+            return "404";
 
         try {
             Integer id = Integer.valueOf(stringId);
@@ -205,12 +228,68 @@ public class AppController {
                 return "404";
             }
 
+            if (userSession.isLoggedIn() && userSession.getUser().isAdmin()) {
+                // admins can see everybody's appointments
+                List<Appointment> apps = appointmentRepository.findByUser(user.get().getId());
+                Collections.reverse(apps);
+                model.addAttribute("appointments", apps);
+            }
+
             model.addAttribute("userSession", userSession);
-            model.addAttribute("profile", user.get());
+            model.addAttribute("userProfile", user.get());
             return "profile";
         } catch (NumberFormatException ex) {
             return "404";
         }
+    }
+
+    @GetMapping("/cancel-appointment/{stringId}")
+    public String cancelAppointment(@PathVariable String stringId) {
+        if (!userSession.isLoggedIn())
+            return "redirect:/login";
+
+        Integer id = Integer.valueOf(stringId);
+        Appointment app = appointmentRepository.findById(id).get();
+
+        if (!userSession.getUser().isAdmin() && userSession.getUser().getId() != app.getUser().getId()) {
+            // Hacker detected! You can't cancel someone else's appointment!
+            return "404";
+        }
+
+        app.setStatus("cancelled");
+        appointmentRepository.save(app);
+
+        AppointmentSlot appSlot = new AppointmentSlot(app.getVaccineCentre(), app.getDate(), app.getTime());
+        appointmentSlotRepository.save(appSlot);
+
+        if (app.getUser().getId() != userSession.getUser().getId()) {
+            return "redirect:/profile/" + app.getUser().getId();
+        }
+
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/complete-appointment/{stringId}")
+    public String completeAppointment(@PathVariable String stringId) {
+        if (!userSession.isLoggedIn())
+            return "redirect:/login";
+
+        Integer id = Integer.valueOf(stringId);
+        Appointment app = appointmentRepository.findById(id).get();
+
+        if (!userSession.getUser().isAdmin()) {
+            // Hacker detected! You can't modify if you're not an admin!
+            return "404";
+        }
+
+        app.setStatus("done");
+        appointmentRepository.save(app);
+
+        if (app.getUser().getId() != userSession.getUser().getId()) {
+            return "redirect:/profile/" + app.getUser().getId();
+        }
+
+        return "redirect:/profile";
     }
 
     @GetMapping("/question")

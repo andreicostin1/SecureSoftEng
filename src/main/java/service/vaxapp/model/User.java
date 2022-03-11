@@ -6,6 +6,7 @@ import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Entity
@@ -117,9 +118,9 @@ public class User {
     }
 
     public int getAge() {
-        // LocalDate birthday = LocalDate.parse(this.dateOfBirth);
-        // return Period.between(birthday, LocalDate.now()).getYears();
-        return 20;
+        LocalDate birthday = LocalDate.parse(this.dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        return Period.between(birthday, LocalDate.now()).getYears();
+        // return 20;
     }
 
     public String getNationality() {

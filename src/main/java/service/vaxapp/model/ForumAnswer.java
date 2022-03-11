@@ -27,7 +27,6 @@ public class ForumAnswer {
 
     // Bidirectional many-to-one relationship (An admin may give multiple answers)
     @ManyToOne
-    @JoinColumn(name = "user_pps", nullable = false)
     private User admin;
 
     public ForumAnswer() {

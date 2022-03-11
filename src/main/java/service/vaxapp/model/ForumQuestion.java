@@ -29,7 +29,6 @@ public class ForumQuestion {
     // Bidirectional many-to-one relationship (Many questions may be asked by one
     // user)
     @ManyToOne()
-    @JoinColumn(name = "user_pps", nullable = false)
     private User user;
 
     public ForumQuestion() {

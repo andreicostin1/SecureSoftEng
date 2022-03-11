@@ -42,7 +42,7 @@
                         <span class="nav-link-inner--text">Statistics</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${userSession.isLoggedIn() && userSession.getUser().isAdmin()}">
                     <a href="/dashboard" class="nav-link" role="button">
                         <span class="nav-link-inner--text">Staff Dashboard</span>
                     </a>
@@ -68,7 +68,7 @@
                 <div class="user-widget">
                     <a class="d-flex align-items-center text-white" href="profile" id="navbarDropdownMenuAvatar" role="button"
                         data-mdb-toggle="dropdown" aria-expanded="false">
-                        <img src="images/faces/team-1.jpg" class="rounded-circle mr-2" height="40" />
+                        <img src="/images/faces/team-1.jpg" class="rounded-circle mr-2" height="40" />
                         <span th:text="${userSession.getUser().getFullName()}">Full Name</span>
                     </a>
                 </div>

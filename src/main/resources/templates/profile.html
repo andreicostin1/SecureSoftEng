@@ -33,14 +33,14 @@
                             <div class="col-lg-4 order-lg-3 text-lg-right align-self-lg-center">
                                 <!-- It's one or the other here (or none), depending on who's viewing the page -->
                                 <div class="card-profile-actions py-4 mt-lg-0 row justify-content-end">
-                                    <button th:if="${profile == null}" type="button" class="btn btn-default">
+                                    <a href="/logout" th:if="${isSelf}" class="btn btn-default">
                                         <span class="btn-inner--icon">
                                             <i class="fa fa-sign-out mr-1"></i>
                                         </span>
                                         Log out
-                                    </button>
+                                    </a>
 
-                                    <button th:if="${userSession.getUser().isAdmin()}" type="button"
+                                    <button th:if="${userSession.isLoggedIn() && userSession.getUser().isAdmin()}" type="button"
                                         class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                                         <span class="btn-inner--icon">
                                             <i class="fa fa-syringe"></i>
@@ -67,12 +67,17 @@
                             </div>
                         </div>
                         <div class="text-center mt-5">
-                            <h3 th:text="${userSession.getUser().getFullName()}">Jessica Jones, </h3><span
-                                class="font-weight-light" th:text="${userSession.getUser().getAge()}"></span>
-                            <div class="h6 font-weight-300"><i class="ni location_pin mr-2"></i>Bucharest, Romania</div>
+                            <h3>
+                                <span th:text="${userProfile.getFullName()}">Vladolf Putler</span>,
+                                <span class="font-weight-light" th:text="${userProfile.getAge()}">69</span>
+                            </h3>
+                            <div th:if="${isSelf == true || (userSession.isLoggedIn() && userSession.getUser().isAdmin())}" class="h6 font-weight-300">
+                                <i class="ni location_pin mr-2"></i>
+                                <span th:text="${userProfile.getAddress()}">Bucharest, Romania</span>
+                            </div>
                         </div>
 
-                        <div class="mt-5 py-5">
+                        <div class="mt-5 py-5" th:if="${appointments}">
                             <h4>Appointments</h4>
                             <table class="table mt-4">
                                 <thead>
@@ -86,41 +91,45 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="text-center">1</td>
-                                        <td>22/03/2022</td>
-                                        <td>1:00pm-1:15pm</td>
-                                        <td>RDS Vaccination Center</td>
-                                        <td class="text-blue"><i class="fa fa-hourglass mr-1"></i>Pending</td>
+                                    <tr th:each="appointment: ${appointments}">
+                                        <td class="text-center" th:text="${appointmentStat.index + 1}">1</td>
+                                        <td th:text="${appointment.getDate()}">22/03/2022</td>
+                                        <td
+                                            th:text="${appointment.getTime()} + ' - ' + ${appointment.getTime().plusMinutes(15)}">
+                                            13:00-13:15</td>
+                                        <td th:text="${appointment.getVaccineCentre().getName()}">
+                                            RDS Vaccination Center
+                                        </td>
+
+                                        <td class="text-blue" th:if="${appointment.status == 'pending'}">
+                                            <i class="fa fa-hourglass mr-1"></i>
+                                            Pending
+                                        </td>
+                                        <td class="text-danger" th:if="${appointment.status == 'cancelled'}">
+                                            <i class="fa fa-cancel mr-1"></i>
+                                            Cancelled
+                                        </td>
+                                        <td class="text-success" th:if="${appointment.status == 'done'}">
+                                            <i class="fa fa-check mr-1"></i>
+                                            Done
+                                        </td>
+
                                         <td class="td-actions text-right">
-                                            <button type="button" class="btn btn-danger btn-icon btn-sm"
-                                                data-toggle="tooltip" data-placement="top" title="Cancel appointment">
+                                            <a th:href="@{/cancel-appointment/{id}(id=${appointment.getId()})}"
+                                                th:if="${appointment.status == 'pending'}" type="button"
+                                                class="btn btn-danger btn-icon btn-sm" data-toggle="tooltip"
+                                                data-placement="top" title="Cancel appointment">
                                                 <i class="fa fa-close"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center">1</td>
-                                        <td>22/03/2022</td>
-                                        <td>1:00pm-1:15pm</td>
-                                        <td>RDS Vaccination Center</td>
-                                        <td class="text-danger"><i class="fa fa-close mr-1"></i>Cancelled</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" class="btn btn-success btn-icon btn-sm"
-                                                data-toggle="tooltip" data-placement="top" title="Complete">
+                                            </a>
+                                            <a th:href="@{/complete-appointment/{id}(id=${appointment.getId()})}"
+                                                th:if="${appointment.status == 'pending' && userSession.getUser().isAdmin()}"
+                                                type="button" class="btn btn-success btn-icon btn-sm"
+                                                data-toggle="tooltip" data-placement="top" title="Mark as done">
                                                 <i class="fa fa-check"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center">1</td>
-                                        <td>22/03/2022</td>
-                                        <td>1:00pm-1:15pm</td>
-                                        <td>RDS Vaccination Center</td>
-                                        <td class="text-success"><i class="fa fa-check mr-1"></i>Done</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" class="btn btn-neutral btn-icon btn-sm"
-                                                data-toggle="tooltip" data-placement="top" title="Details">
+                                            </a>
+                                            <button th:if="${appointment.status != 'pending'}" type="button"
+                                                class="btn btn-neutral btn-icon btn-sm" data-toggle="tooltip"
+                                                data-placement="top" title="Details">
                                                 <i class="fa fa-info"></i>
                                             </button>
                                         </td>
@@ -128,6 +137,7 @@
                                 </tbody>
                             </table>
                         </div>
+
                         <div class="py-5">
                             <h4>Vaccinations</h4>
                             <table class="table mt-4">
