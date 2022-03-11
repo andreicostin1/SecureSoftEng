@@ -110,31 +110,6 @@ public class AppController {
         return "redirect:/profile";
     }
 
-    @PostMapping(value = "/assign-vaccine")
-    public String assignVaccine(@RequestParam Map<String, String> body, Model model) {
-        if (!userSession.isLoggedIn()) {
-            return "redirect:/login";
-        }
-
-        if (!userSession.getUser().isAdmin()) {
-            // Hacks detected!
-            return "redirect:/login";
-        }
-
-        LocalDate vaxDate = LocalDate.parse(body.get("date"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        Integer userId = Integer.valueOf(body.get("user_id"));
-        Integer centreId = Integer.valueOf(body.get("center_id"));
-        String vaxType = body.get("vaccine");
-
-        User vaxUser = userRepository.findById(userId).get();
-        VaccineCentre vaxCentre = vaccineCentreRepository.findById(centreId).get();
-
-        Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
-        vaccineRepository.save(vax);
-
-        return "redirect:/profile/" + userId;
-    }
-
     @GetMapping("/stats")
     public String statistics(Model model) {
         model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
@@ -170,17 +145,19 @@ public class AppController {
         return "stats.html";
     }
 
-    @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        if (!userSession.isLoggedIn())
-            return "redirect:/login";
-        if (!userSession.getUser().isAdmin())
-            return "redirect:/";
-
+    @GetMapping("/forum")
+    public String forum(Model model) {
+        // Retrieve all questions and answers from database
+        List<ForumQuestion> questions = forumQuestionRepository.findAll();
+        model.addAttribute("questions", questions);
+        // TODO - add DB retrieval logic + authorization check
         model.addAttribute("userSession", userSession);
-        return "dashboard";
+        return "forum";
     }
 
+    /**
+     * User Area
+     */
     @GetMapping("/login")
     public String login(Model model) {
         // TODO - add DB retrieval logic
@@ -222,16 +199,6 @@ public class AppController {
     public String logout() {
         userSession.setUserId(null);
         return "redirect:/";
-    }
-
-    @GetMapping("/forum")
-    public String forum(Model model) {
-        // Retrieve all questions and answers from database
-        List<ForumQuestion> questions = forumQuestionRepository.findAll();
-        model.addAttribute("questions", questions);
-        // TODO - add DB retrieval logic + authorization check
-        model.addAttribute("userSession", userSession);
-        return "forum";
     }
 
     @GetMapping("/ask-a-question")
@@ -341,29 +308,6 @@ public class AppController {
         return "redirect:/profile";
     }
 
-    @GetMapping("/complete-appointment/{stringId}")
-    public String completeAppointment(@PathVariable String stringId) {
-        if (!userSession.isLoggedIn())
-            return "redirect:/login";
-
-        Integer id = Integer.valueOf(stringId);
-        Appointment app = appointmentRepository.findById(id).get();
-
-        if (!userSession.getUser().isAdmin()) {
-            // Hacker detected! You can't modify if you're not an admin!
-            return "404";
-        }
-
-        app.setStatus("done");
-        appointmentRepository.save(app);
-
-        if (app.getUser().getId() != userSession.getUser().getId()) {
-            return "redirect:/profile/" + app.getUser().getId();
-        }
-
-        return "redirect:/profile";
-    }
-
     @GetMapping("/question")
     public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
         // Retrieve question
@@ -377,6 +321,51 @@ public class AppController {
             // Redirect if question not found
             return "redirect:/forum";
         }
+    }
+
+    /**
+     * Admin area
+     */
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
+        if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin())
+            return "redirect:/login";
+
+        model.addAttribute("users", userRepository.findAll());
+        model.addAttribute("userSession", userSession);
+        return "dashboard";
+    }
+
+    @PostMapping(value = "/find-user")
+    public String findUser(@RequestParam Map<String, String> body, Model model) {
+        String input = body.get("input");
+
+        User user = userRepository.findByPPSorName(input);
+        if (user == null) {
+            return "redirect:/dashboard";
+        }
+
+        return "redirect:/profile/" + user.getId();
+    }
+
+    @PostMapping(value = "/assign-vaccine")
+    public String assignVaccine(@RequestParam Map<String, String> body, Model model) {
+        if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin()) {
+            return "redirect:/login";
+        }
+
+        LocalDate vaxDate = LocalDate.parse(body.get("date"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        Integer userId = Integer.valueOf(body.get("user_id"));
+        Integer centreId = Integer.valueOf(body.get("center_id"));
+        String vaxType = body.get("vaccine");
+
+        User vaxUser = userRepository.findById(userId).get();
+        VaccineCentre vaxCentre = vaccineCentreRepository.findById(centreId).get();
+
+        Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
+        vaccineRepository.save(vax);
+
+        return "redirect:/profile/" + userId;
     }
 
     @PostMapping("/question")
@@ -405,6 +394,29 @@ public class AppController {
         } else {
             return "redirect:/forum";
         }
+    }
+
+    @GetMapping("/complete-appointment/{stringId}")
+    public String completeAppointment(@PathVariable String stringId) {
+        if (!userSession.isLoggedIn())
+            return "redirect:/login";
+
+        if (!userSession.getUser().isAdmin()) {
+            // Hacker detected! You can't modify if you're not an admin!
+            return "404";
+        }
+
+        Integer id = Integer.valueOf(stringId);
+        Appointment app = appointmentRepository.findById(id).get();
+
+        app.setStatus("done");
+        appointmentRepository.save(app);
+
+        if (app.getUser().getId() != userSession.getUser().getId()) {
+            return "redirect:/profile/" + app.getUser().getId();
+        }
+
+        return "redirect:/profile";
     }
 
     /**
