@@ -124,8 +124,6 @@ public class AppController {
 
     @PostMapping("/stats")
     public String statistics(Model model, @RequestParam("nationality") String country) {
-        if (!userSession.isLoggedIn()) return "redirect:/login";
-
         model.addAttribute("dosesByNationality", userRepository.countByNationality(country).size());
         model.addAttribute("country", country);
         getStats(model);
