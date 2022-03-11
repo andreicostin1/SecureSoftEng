@@ -66,15 +66,15 @@
                 <div class="col-lg-4 order-lg-1">
                   <div class="card-profile-stats d-flex justify-content-center">
                     <div>
-                      <span class="heading">4</span>
+                      <span class="heading" th:text="${userDoses}">0</span>
                       <span class="description">Doses</span>
                     </div>
                     <div>
-                      <span class="heading">2</span>
+                      <span class="heading" th:text="${userQuestions}">0</span>
                       <span class="description">Questions</span>
                     </div>
                     <div>
-                      <span class="heading">0</span>
+                      <span class="heading" th:text="${userAppts}">0</span>
                       <span class="description">Appointments</span>
                     </div>
                   </div>
@@ -83,8 +83,8 @@
 
               <div class="text-center mt-5">
                 <h3>
-                  <span th:text="${userProfile.getFullName()}">Vladolf Putler</span>,
-                  <span class="font-weight-light" th:text="${userProfile.getAge()}">69</span>
+                  <span th:text="${userProfile.getFullName()}">John Doe</span>,
+                  <span class="font-weight-light" th:text="${userProfile.getAge()}">45</span>
                 </h3>
                 <div
                   th:if="${isSelf == true || (userSession.isLoggedIn() && userSession.getUser().isAdmin())}"
