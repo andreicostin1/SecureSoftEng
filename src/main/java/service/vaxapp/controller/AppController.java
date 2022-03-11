@@ -130,15 +130,15 @@ public class AppController {
         model.addAttribute("userSession", userSession);
         model.addAttribute("totalDoses", vaccineRepository.count());
         List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
-        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("male")).count();
-        long female = users.size() - male;
-        Map<Integer, Long> ageRanges = new TreeMap<>();
+        long total = users.size();
+        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("Male")).count();
+        long female = total - male;
+        Map<Integer, Double> ageRanges = new TreeMap<>();
 
-        for (AtomicInteger i = new AtomicInteger(0); i.get() <= 8; i.incrementAndGet()) {
-            ageRanges.put(i.get() * 10, users.stream().filter(x -> x.getAge() / 10 == i.get()).count());
+        for (AtomicInteger i = new AtomicInteger(1); i.get() <= 8; i.incrementAndGet()) {
+            long count = users.stream().filter(x -> x.getAge() / 10 == i.get()).count();
+            ageRanges.put(i.get() * 10, count == 0 ? 0.0 : count / total * 100);
         }
-
-        ageRanges.forEach((k, v) -> v = v / userRepository.count());
 
         model.addAttribute("agerange", ageRanges);
         model.addAttribute("maleDosePercent", male / userRepository.count());
