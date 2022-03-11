@@ -245,8 +245,7 @@ public class AppController {
         }
 
         // Create new question entry in db
-        ForumQuestion newQuestion = new ForumQuestion(title, details, getDateSubmitted());
-        newQuestion.setUser(userSession.getUser());
+        ForumQuestion newQuestion = new ForumQuestion(title, details, getDateSubmitted(), userSession.getUser());
 
         // Add question to database
         forumQuestionRepository.save(newQuestion);

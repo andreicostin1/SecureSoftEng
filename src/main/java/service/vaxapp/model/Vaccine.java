@@ -20,13 +20,13 @@ public class Vaccine {
     @ManyToOne
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne
     private User admin;
 
     @Column(name = "date_received")
     private LocalDate dateReceived;
 
-    @ManyToOne(targetEntity = VaccineCentre.class, cascade = CascadeType.ALL)
+    @ManyToOne
     private VaccineCentre vaccineCentre;
 
     @Column()

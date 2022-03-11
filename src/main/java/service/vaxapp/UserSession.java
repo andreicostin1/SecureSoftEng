@@ -1,6 +1,5 @@
 package service.vaxapp;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
 import service.vaxapp.model.User;
-import service.vaxapp.model.VaccineCentre;
 import service.vaxapp.repository.UserRepository;
 
 @Component
