@@ -1,7 +1,9 @@
 package service.vaxapp.controller;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import service.vaxapp.model.ForumAnswer;
 import service.vaxapp.model.ForumQuestion;
@@ -187,13 +190,16 @@ public class AppController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam("email") String email, @RequestParam("pps") String pps) {
+    public String login(@RequestParam("email") String email, @RequestParam("pps") String pps,
+            RedirectAttributes redirectAttributes) {
         // make sure the user is found in db by PPS and email
         User user = userRepository.findByCredentials(email, pps);
         if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "User does not exist.");
             return "redirect:/login";
         }
         userSession.setUserId(user.getId());
+        redirectAttributes.addFlashAttribute("success", "You are now logged in.");
         return "redirect:/";
     }
 
@@ -204,14 +210,22 @@ public class AppController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String register(User user) {
+    public String register(User user, RedirectAttributes redirectAttributes) {
         if (userRepository.findByPPS(user.getPPS()) != null) {
+            redirectAttributes.addFlashAttribute("error", "User with pps number already exists.");
             return "redirect:/register";
         }
         if (userRepository.findByEmail(user.getEmail()) != null) {
+            redirectAttributes.addFlashAttribute("error", "User with email already exists.");
+            return "redirect:/register";
+        }
+        // Ensure user is 18 or older
+        if (isUserUnderage(user.getDateOfBirth())) {
+            redirectAttributes.addFlashAttribute("error", "Users under 18 cannot create an account.");
             return "redirect:/register";
         }
         userRepository.save(user);
+        redirectAttributes.addFlashAttribute("success", "User was created, you may now login.");
         return "redirect:/login";
     }
 
@@ -423,5 +437,10 @@ public class AppController {
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return currentDate.format(formatter);
+    }
+
+    private boolean isUserUnderage(String dateOfBirth) {
+        LocalDate dob = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        return Period.between(dob, LocalDate.now()).getYears() < 18;
     }
 }

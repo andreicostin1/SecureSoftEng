@@ -1,0 +1,4 @@
+<div th:fragment="alert" class="container mt-2" th:if="${error != null or success != null}">
+  <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+  <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+</div>
