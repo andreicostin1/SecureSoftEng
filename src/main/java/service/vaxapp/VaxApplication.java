@@ -91,8 +91,8 @@ public class VaxApplication {
                 ForumQuestion q1 = new ForumQuestion("Do I really need my 5th (booster) shot?",
                         "I got 2 doses of Pfizer and 2 doses of Moderna.\nDo I need another vaccine shot?",
                         LocalDate.now().toString(), andrei);
-                ForumQuestion q2 = new ForumQuestion("How bad is COVID really?",
-                        "I heard it might be bad but also my neighbours had covid and he was fine. Are you all lying?",
+                ForumQuestion q2 = new ForumQuestion("How long do I have to wait for an appointment?",
+                        "Hi! I was wondering what is the wait period between vaccination doses. Thanks!",
                         LocalDate.now().plusDays(-1).toString(), andra);
 
                 forumQuestionRepo.save(q1);

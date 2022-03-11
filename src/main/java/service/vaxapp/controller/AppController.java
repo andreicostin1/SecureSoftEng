@@ -317,12 +317,12 @@ public class AppController {
                 return "404";
             }
 
+            List<Vaccine> vaxes = vaccineRepository.findByUser(user.get().getId());
+
             if (userSession.isLoggedIn() && userSession.getUser().isAdmin()) {
                 // admins can see everybody's appointments
                 List<Appointment> apps = appointmentRepository.findByUser(user.get().getId());
                 Collections.reverse(apps);
-
-                List<Vaccine> vaxes = vaccineRepository.findByUser(user.get().getId());
                 Collections.reverse(vaxes);
 
                 model.addAttribute("appointments", apps);
@@ -332,6 +332,9 @@ public class AppController {
             model.addAttribute("vaccineCenters", vaccineCentreRepository.findAll());
             model.addAttribute("userSession", userSession);
             model.addAttribute("userProfile", user.get());
+            model.addAttribute("userQuestions", forumQuestionRepository.findByUser(user.get().getId()).size());
+            model.addAttribute("userDoses", vaxes.size());
+            model.addAttribute("userAppts", appointmentRepository.findByUser(user.get().getId()).size());
             return "profile";
         } catch (NumberFormatException ex) {
             return "404";
