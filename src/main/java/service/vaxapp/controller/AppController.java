@@ -92,17 +92,17 @@ public class AppController {
 
     @GetMapping("/stats")
     public String statistics(Model model) {
-        getStats(model);
+        getStats(model, "irish");
         return "stats.html";
     }
 
-    private void getStats(Model model) {
+    private void getStats(Model model, String country) {
         model.addAttribute("userSession", userSession);
         model.addAttribute("totalDoses", vaccineRepository.count());
         List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
 
-        model.addAttribute("dosesByNationality", users.stream().peek(x -> System.out.println(x.getNationality())).filter(x -> x.getNationality().equalsIgnoreCase("irish")).count());
-        model.addAttribute("country", "Irish");
+        model.addAttribute("dosesByNationality", users.stream().distinct().filter(x -> x.getNationality().equalsIgnoreCase(country)).count());
+        model.addAttribute("country", country);
 
         long total = users.size();
         long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("male")).count();
@@ -121,9 +121,7 @@ public class AppController {
 
     @PostMapping("/stats")
     public String statistics(Model model, @RequestParam("nationality") String country) {
-        getStats(model);
-        model.addAttribute("dosesByNationality", userRepository.countByNationality(country).size());
-        model.addAttribute("country", country);
+        getStats(model, country);
         return "stats.html";
     }
 
