@@ -1,5 +1,6 @@
 package service.vaxapp.controller;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Period;
@@ -424,7 +425,8 @@ public class AppController {
     }
 
     @PostMapping(value = "/assign-vaccine")
-    public String assignVaccine(@RequestParam Map<String, String> body, Model model) {
+    public String assignVaccine(@RequestParam Map<String, String> body, Model model,
+            RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin()) {
             return "redirect:/login";
         }
@@ -436,7 +438,39 @@ public class AppController {
 
         User vaxUser = userRepository.findById(userId).get();
         VaccineCentre vaxCentre = vaccineCentreRepository.findById(centreId).get();
+        redirectAttributes.addFlashAttribute("success", "The vaccine was recorded.");
 
+        // See how many other doses there are per user
+        List<Vaccine> vaccines = vaccineRepository.findByUser(userId);
+        if (vaccines == null || vaccines.size() == 0) {
+            // Getting date in 3 weeks for second vaccination between 9 and 17
+            LocalDate date = vaxDate.plusDays(21);
+            LocalTime time = LocalTime.of(9, 00, 00);
+            Appointment appointment = appointmentRepository.findByDetails(centreId, date, time);
+            while (appointment != null) {
+                time = time.plusMinutes(15);
+                if (time.getHour() > 17) {
+                    if (date.getDayOfWeek() == DayOfWeek.FRIDAY) {
+                        date = date.plusDays(3);
+                    } else {
+                        date = date.plusDays(1);
+                    }
+                    time = LocalTime.of(9, 00, 00);
+                }
+                appointment = appointmentRepository.findByDetails(centreId, date, time);
+            }
+            User user = userRepository.findById(userId).get();
+            // Creating new appointment for the user
+            appointment = new Appointment(vaxCentre, date, time, user, "pending");
+            appointmentRepository.save(appointment);
+            redirectAttributes.addFlashAttribute("success",
+                    "The vaccine was recorded and a new appointment at least 3 weeks from now has been made for the user.");
+
+        } else if (vaccines != null && vaccines.size() > 1) {
+            redirectAttributes.addFlashAttribute("error", "A user can only receive 2 vaccine doses.");
+            return "redirect:/profile/" + userId;
+        }
+        // Save new vaccine
         Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
         vaccineRepository.save(vax);
 
