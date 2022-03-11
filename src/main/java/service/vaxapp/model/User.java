@@ -120,7 +120,6 @@ public class User {
     public int getAge() {
         LocalDate birthday = LocalDate.parse(this.dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         return Period.between(birthday, LocalDate.now()).getYears();
-        // return 20;
     }
 
     public String getNationality() {
