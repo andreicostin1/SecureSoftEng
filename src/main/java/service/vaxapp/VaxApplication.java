@@ -38,7 +38,7 @@ public class VaxApplication {
 
             if (userRepo.findAll().size() == 0) {
                 // init db
-                final User admin = new User("1234", "Vladolf Putler", "Kremlin", "", "admin@vaxapp.com", "07/10/1952",
+                final User admin = new User("1234", "John Doe", "The Internet", "", "admin@vaxapp.com", "07/10/1952",
                         "Russian", "Male", true);
                 final User dragos = new User("1111", "Dragos George", "Bucharest", "", "dragos@vaxapp.com",
                         "05/06/1999",
