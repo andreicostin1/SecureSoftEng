@@ -211,11 +211,11 @@ public class AppController {
         // make sure the user is found in db by PPS and email
         User user = userRepository.findByCredentials(email, pps);
         if (user == null) {
-            redirectAttributes.addFlashAttribute("error", "User does not exist.");
+            redirectAttributes.addFlashAttribute("error", "Wrong credentials.");
             return "redirect:/login";
         }
         userSession.setUserId(user.getId());
-        redirectAttributes.addFlashAttribute("success", "You are now logged in.");
+        redirectAttributes.addFlashAttribute("success", "Welcome, " + user.getFullName() + "!");
         return "redirect:/";
     }
 
@@ -227,12 +227,16 @@ public class AppController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String register(User user, RedirectAttributes redirectAttributes) {
+        if (user.getDateOfBirth().isEmpty() || user.getEmail().isEmpty() || user.getAddress().isEmpty() || user.getFullName().isEmpty() || user.getGender().isEmpty() || user.getNationality().isEmpty() || user.getPhoneNumber().isEmpty() || user.getPPS().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "All fields are required!");
+            return "redirect:/register";
+        }
         if (userRepository.findByPPS(user.getPPS()) != null) {
-            redirectAttributes.addFlashAttribute("error", "User with pps number already exists.");
+            redirectAttributes.addFlashAttribute("error", "User with this PPS number already exists.");
             return "redirect:/register";
         }
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            redirectAttributes.addFlashAttribute("error", "User with email already exists.");
+            redirectAttributes.addFlashAttribute("error", "User with this email already exists.");
             return "redirect:/register";
         }
         // Ensure user is 18 or older
@@ -241,7 +245,7 @@ public class AppController {
             return "redirect:/register";
         }
         userRepository.save(user);
-        redirectAttributes.addFlashAttribute("success", "User was created, you may now login.");
+        redirectAttributes.addFlashAttribute("success", "Account created! You can sign in now.");
         return "redirect:/login";
     }
 
