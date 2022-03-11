@@ -276,6 +276,9 @@ public class AppController {
         model.addAttribute("userSession", userSession);
         model.addAttribute("userProfile", userSession.getUser());
         model.addAttribute("isSelf", true);
+        model.addAttribute("userDoses", vaxes.size());
+        model.addAttribute("userQuestions", forumQuestionRepository.findByUser(userSession.getUserId()).size());
+        model.addAttribute("userAppts", appointmentRepository.findByUser(userSession.getUserId()).size());
         return "profile";
     }
 
