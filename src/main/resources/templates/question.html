@@ -10,8 +10,9 @@
         <div class="section section-shaped">
             <div class="navbar-background"></div>
             <div class="page-header">
-                <div class="container py-lg px-4">
-                    <h4 class="question-title mb-2" th:text="${question.title}"></h4>
+                <div class="container py-5 px-4">
+                    <div th:replace="fragments/alert :: alert"></div>
+                    <h4 class="question-title mb-2 mt-5" th:text="${question.title}"></h4>
                     <h6 class="question-details mb-3">
                         <a th:href="@{/profile/{id}(id=${question.getUser().getId()})}"
                             th:text="'@' + ${question.getUser().fullName}"></a>

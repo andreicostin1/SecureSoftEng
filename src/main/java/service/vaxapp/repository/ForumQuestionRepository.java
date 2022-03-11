@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import service.vaxapp.model.Appointment;
 import service.vaxapp.model.ForumQuestion;
-import service.vaxapp.model.Vaccine;
 
 import java.util.List;
 
