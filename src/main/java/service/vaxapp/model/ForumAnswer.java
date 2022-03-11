@@ -17,7 +17,10 @@ public class ForumAnswer {
     private Integer id;
 
     @Column
-    private String answer;
+    private String body;
+
+    @Column(name = "date_dubmitted")
+    private String dateSubmitted;
 
     // Bidirectional many-to-one relationship (A forum question may have multiple
     // answers)
@@ -32,8 +35,9 @@ public class ForumAnswer {
     public ForumAnswer() {
     }
 
-    public ForumAnswer(String answer) {
-        this.answer = answer;
+    public ForumAnswer(String answer, String dateSubmitted) {
+        this.body = answer;
+        this.dateSubmitted = dateSubmitted;
     }
 
     public Integer getId() {
@@ -44,12 +48,20 @@ public class ForumAnswer {
         this.id = id;
     }
 
-    public String getAnswer() {
-        return answer;
+    public String getBody() {
+        return body;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getDateSubmitted() {
+        return dateSubmitted;
+    }
+
+    public void setDateSubmitted(String dateSubmitted) {
+        this.dateSubmitted = dateSubmitted;
     }
 
     public ForumQuestion getQuestion() {
