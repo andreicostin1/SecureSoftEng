@@ -109,31 +109,6 @@ public class AppController {
         return "redirect:/profile";
     }
 
-    @PostMapping(value = "/assign-vaccine")
-    public String assignVaccine(@RequestParam Map<String, String> body, Model model) {
-        if (!userSession.isLoggedIn()) {
-            return "redirect:/login";
-        }
-
-        if (!userSession.getUser().isAdmin()) {
-            // Hacks detected!
-            return "redirect:/login";
-        }
-
-        LocalDate vaxDate = LocalDate.parse(body.get("date"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        Integer userId = Integer.valueOf(body.get("user_id"));
-        Integer centreId = Integer.valueOf(body.get("center_id"));
-        String vaxType = body.get("vaccine");
-
-        User vaxUser = userRepository.findById(userId).get();
-        VaccineCentre vaxCentre = vaccineCentreRepository.findById(centreId).get();
-
-        Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
-        vaccineRepository.save(vax);
-
-        return "redirect:/profile/" + userId;
-    }
-
     @GetMapping("/stats")
     public String statistics(Model model) {
         model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
@@ -169,17 +144,9 @@ public class AppController {
         return "stats.html";
     }
 
-    @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        if (!userSession.isLoggedIn())
-            return "redirect:/login";
-        if (!userSession.getUser().isAdmin())
-            return "redirect:/";
-
-        model.addAttribute("userSession", userSession);
-        return "dashboard";
-    }
-
+    /**
+     * User Area
+     */
     @GetMapping("/login")
     public String login(Model model) {
         model.addAttribute("userSession", userSession);
@@ -260,24 +227,8 @@ public class AppController {
         return "redirect:/question?id=" + newQuestion.getId();
     }
 
-    @GetMapping("/question")
-    public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
-        // Retrieve question
-        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
-        if (question.isPresent()) {
-            // Return question information
-            model.addAttribute("question", question.get());
-            model.addAttribute("userSession", userSession);
-            return "question.html";
-        } else {
-            // Redirect if question not found
-            return "redirect:/forum";
-        }
-    }
-
     @PostMapping("/question")
-    public String answerQuestion(
-            @RequestParam String body, @RequestParam String id, Model model) {
+    public String answerQuestion(@RequestParam String body, @RequestParam String id, Model model) {
         // Retrieving question
         try {
             Integer questionId = Integer.parseInt(id);
@@ -388,18 +339,78 @@ public class AppController {
         return "redirect:/profile";
     }
 
+    @GetMapping("/question")
+    public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
+        // Retrieve question
+        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
+        if (question.isPresent()) {
+            // Return question information
+            model.addAttribute("question", question.get());
+            model.addAttribute("userSession", userSession);
+            return "question.html";
+        } else {
+            // Redirect if question not found
+            return "redirect:/forum";
+        }
+    }
+
+    /**
+     * Admin area
+     */
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
+        if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin())
+            return "redirect:/login";
+
+        model.addAttribute("users", userRepository.findAll());
+        model.addAttribute("userSession", userSession);
+        return "dashboard";
+    }
+
+    @PostMapping(value = "/find-user")
+    public String findUser(@RequestParam Map<String, String> body, Model model) {
+        String input = body.get("input");
+
+        User user = userRepository.findByPPSorName(input);
+        if (user == null) {
+            return "redirect:/dashboard";
+        }
+
+        return "redirect:/profile/" + user.getId();
+    }
+
+    @PostMapping(value = "/assign-vaccine")
+    public String assignVaccine(@RequestParam Map<String, String> body, Model model) {
+        if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin()) {
+            return "redirect:/login";
+        }
+
+        LocalDate vaxDate = LocalDate.parse(body.get("date"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        Integer userId = Integer.valueOf(body.get("user_id"));
+        Integer centreId = Integer.valueOf(body.get("center_id"));
+        String vaxType = body.get("vaccine");
+
+        User vaxUser = userRepository.findById(userId).get();
+        VaccineCentre vaxCentre = vaccineCentreRepository.findById(centreId).get();
+
+        Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
+        vaccineRepository.save(vax);
+
+        return "redirect:/profile/" + userId;
+    }
+
     @GetMapping("/complete-appointment/{stringId}")
     public String completeAppointment(@PathVariable String stringId) {
         if (!userSession.isLoggedIn())
             return "redirect:/login";
 
-        Integer id = Integer.valueOf(stringId);
-        Appointment app = appointmentRepository.findById(id).get();
-
         if (!userSession.getUser().isAdmin()) {
             // Hacker detected! You can't modify if you're not an admin!
             return "404";
         }
+
+        Integer id = Integer.valueOf(stringId);
+        Appointment app = appointmentRepository.findById(id).get();
 
         app.setStatus("done");
         appointmentRepository.save(app);
