@@ -1,6 +1,5 @@
 package service.vaxapp.controller;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Period;
@@ -85,13 +84,17 @@ public class AppController {
     }
 
     @PostMapping(value = "/make-appointment")
-    public String makeAppointment(@RequestParam Map<String, String> body, Model model) {
+    public String makeAppointment(@RequestParam Map<String, String> body, Model model,
+            RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn()) {
+            redirectAttributes.addFlashAttribute("error", "You must be logged in to make an appointment.");
             return "redirect:/login";
         }
 
         // A user shouldn't have more than one pending appointment
         if (appointmentRepository.findPending(userSession.getUserId()) != null) {
+            redirectAttributes.addFlashAttribute("error",
+                    "You can only have one pending appointment at a time. Please check your appointment list.");
             return "redirect:/";
         }
 
@@ -101,6 +104,7 @@ public class AppController {
 
         AppointmentSlot appSlot = appointmentSlotRepository.findByDetails(centerId, date, time);
         if (appSlot == null) {
+            redirectAttributes.addFlashAttribute("error", "The appointment slot you selected is no longer available.");
             return "redirect:/";
         }
 
@@ -109,11 +113,14 @@ public class AppController {
         appointmentRepository.save(app);
         appointmentSlotRepository.delete(appSlot);
 
+        redirectAttributes.addFlashAttribute("success",
+                "Your appointment has been made! Please see the details of your new appointment.");
         return "redirect:/profile";
     }
 
     @PostMapping(value = "/assign-vaccine")
-    public String assignVaccine(@RequestParam Map<String, String> body, Model model) {
+    public String assignVaccine(@RequestParam Map<String, String> body, Model model,
+            RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn()) {
             return "redirect:/login";
         }
@@ -134,6 +141,8 @@ public class AppController {
         Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
         vaccineRepository.save(vax);
 
+        redirectAttributes.addFlashAttribute("success",
+                "The user's new vaccine information was recorded successfully.");
         return "redirect:/profile/" + userId;
     }
 
@@ -173,11 +182,18 @@ public class AppController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        if (!userSession.isLoggedIn())
+    public String dashboard(Model model, RedirectAttributes redirectAttributes) {
+        if (!userSession.isLoggedIn()) {
+            redirectAttributes.addFlashAttribute("error",
+                    "The dashboard may only be accessed by logged in admins. If you are an admin, please log in.");
             return "redirect:/login";
-        if (!userSession.getUser().isAdmin())
+        }
+
+        if (!userSession.getUser().isAdmin()) {
+            redirectAttributes.addFlashAttribute("error",
+                    "The dashboard may only be accessed by logged in admins.");
             return "redirect:/";
+        }
 
         model.addAttribute("userSession", userSession);
         return "dashboard";
@@ -245,10 +261,10 @@ public class AppController {
     }
 
     @GetMapping("/ask-a-question")
-    public String askAQuestion(Model model) {
+    public String askAQuestion(Model model, RedirectAttributes redirectAttributes) {
         // If not logged in or admin, return to forum
-        if (!userSession.isLoggedIn()
-                || (userSession.isLoggedIn() && userSession.getUser() != null && userSession.getUser().isAdmin())) {
+        if (!userSession.isLoggedIn() || userSession.getUser().isAdmin()) {
+            redirectAttributes.addFlashAttribute("error", "Users must be logged in to ask questions.");
             return "redirect:/forum";
         }
         // If user, return ask-a-question page
@@ -257,9 +273,11 @@ public class AppController {
     }
 
     @PostMapping("/ask-a-question")
-    public String askAQuestion(@RequestParam String title, @RequestParam String details, Model model) {
+    public String askAQuestion(@RequestParam String title, @RequestParam String details, Model model,
+            RedirectAttributes redirectAttributes) {
         // If user is not logged in or is admin
         if (!userSession.isLoggedIn() || userSession.getUser().isAdmin()) {
+            redirectAttributes.addFlashAttribute("error", "Users must be logged in to ask questions.");
             return "redirect:/forum";
         }
 
@@ -270,12 +288,15 @@ public class AppController {
         // Add question to database
         forumQuestionRepository.save(newQuestion);
 
+        redirectAttributes.addFlashAttribute("success", "The question was successfully submitted.");
+
         // Redirect to new question page
         return "redirect:/question?id=" + newQuestion.getId();
     }
 
     @GetMapping("/question")
-    public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
+    public String getQuestionById(@RequestParam(name = "id") Integer id, Model model,
+            RedirectAttributes redirectAttributes) {
         // Retrieve question
         Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
         if (question.isPresent()) {
@@ -284,6 +305,7 @@ public class AppController {
             model.addAttribute("userSession", userSession);
             return "question.html";
         } else {
+            redirectAttributes.addFlashAttribute("error", "The question you requested could not be found.");
             // Redirect if question not found
             return "redirect:/forum";
         }
@@ -291,7 +313,7 @@ public class AppController {
 
     @PostMapping("/question")
     public String answerQuestion(
-            @RequestParam String body, @RequestParam String id, Model model) {
+            @RequestParam String body, @RequestParam String id, Model model, RedirectAttributes redirectAttributes) {
         // Retrieving question
         try {
             Integer questionId = Integer.parseInt(id);
@@ -308,9 +330,12 @@ public class AppController {
                     question.get().addAnswer(newAnswer);
                     forumQuestionRepository.save(question.get());
 
+                    redirectAttributes.addFlashAttribute("success", "The answer was successfully submitted.");
                     // Redirect to updated question page
                     return "redirect:/question?id=" + question.get().getId();
                 } else {
+                    redirectAttributes.addFlashAttribute("error",
+                            "Only admins may answer questions. If you are an admin, please log in.");
                     // Redirect to unchanged same question page
                     return "redirect:/question?id=" + question.get().getId();
                 }
@@ -323,9 +348,12 @@ public class AppController {
     }
 
     @GetMapping("/profile")
-    public String profile(Model model) {
-        if (!userSession.isLoggedIn())
+    public String profile(Model model, RedirectAttributes redirectAttributes) {
+        if (!userSession.isLoggedIn()) {
+            redirectAttributes.addFlashAttribute("error",
+                    "You must be logged in to view your profile. If you do not already have an account, please register.");
             return "redirect:/login";
+        }
 
         List<Appointment> apps = appointmentRepository.findByUser(userSession.getUserId());
         Collections.reverse(apps);
@@ -377,7 +405,7 @@ public class AppController {
     }
 
     @GetMapping("/cancel-appointment/{stringId}")
-    public String cancelAppointment(@PathVariable String stringId) {
+    public String cancelAppointment(@PathVariable String stringId, RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn())
             return "redirect:/login";
 
@@ -395,6 +423,8 @@ public class AppController {
         AppointmentSlot appSlot = new AppointmentSlot(app.getVaccineCentre(), app.getDate(), app.getTime());
         appointmentSlotRepository.save(appSlot);
 
+        redirectAttributes.addFlashAttribute("success", "The appointment was successfully cancelled.");
+
         if (app.getUser().getId() != userSession.getUser().getId()) {
             return "redirect:/profile/" + app.getUser().getId();
         }
@@ -403,7 +433,7 @@ public class AppController {
     }
 
     @GetMapping("/complete-appointment/{stringId}")
-    public String completeAppointment(@PathVariable String stringId) {
+    public String completeAppointment(@PathVariable String stringId, RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn())
             return "redirect:/login";
 
@@ -417,6 +447,8 @@ public class AppController {
 
         app.setStatus("done");
         appointmentRepository.save(app);
+
+        redirectAttributes.addFlashAttribute("success", "The appointment was marked as complete.");
 
         if (app.getUser().getId() != userSession.getUser().getId()) {
             return "redirect:/profile/" + app.getUser().getId();

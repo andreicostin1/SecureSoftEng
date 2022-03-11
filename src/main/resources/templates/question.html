@@ -7,6 +7,7 @@
     <div class="wrapper">
       <div class="section section-shaped">
         <div class="navbar-background"></div>
+        <div th:replace="fragments/alert :: alert"></div>
         <div class="page-header">
           <div class="container py-lg px-4">
             <h4 class="question-title mb-2" th:text="${question.title}"></h4>
