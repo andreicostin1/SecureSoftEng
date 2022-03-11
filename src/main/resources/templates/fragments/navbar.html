@@ -66,7 +66,7 @@
 
             <ul th:if="${userSession.isLoggedIn()}" class="navbar-nav align-items-lg-center ml-lg-auto">
                 <div class="user-widget">
-                    <a class="d-flex align-items-center text-white" href="profile" id="navbarDropdownMenuAvatar" role="button"
+                    <a class="d-flex align-items-center text-white" href="/profile" id="navbarDropdownMenuAvatar" role="button"
                         data-mdb-toggle="dropdown" aria-expanded="false">
                         <img src="/images/faces/team-1.jpg" class="rounded-circle mr-2" height="40" />
                         <span th:text="${userSession.getUser().getFullName()}">Full Name</span>

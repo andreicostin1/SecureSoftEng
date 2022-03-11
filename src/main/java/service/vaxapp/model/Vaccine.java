@@ -20,24 +20,31 @@ public class Vaccine {
     @ManyToOne
     private User user;
 
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private User admin;
+
     @Column(name = "date_received")
     private LocalDate dateReceived;
 
-    // many-to-one relationship (Many vaccines may be given at one
-    // vaccine centre)
     @ManyToOne(targetEntity = VaccineCentre.class, cascade = CascadeType.ALL)
     private VaccineCentre vaccineCentre;
 
-    // Bidirectional many-to-one relationship (Many vaccines may be assigned by one
-    // admin)
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private User admin;
+    @Column()
+    private String type;
 
     public Vaccine() {
     }
 
-    public Vaccine(LocalDate dateReceived) {
+    public Vaccine(User admin, LocalDate dateReceived, VaccineCentre vaccineCentre, User user, String type) {
+        this.admin = admin;
         this.dateReceived = dateReceived;
+        this.vaccineCentre = vaccineCentre;
+        this.user = user;
+        this.type = type;
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public User getAdmin() {
@@ -71,4 +78,14 @@ public class Vaccine {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    
 }

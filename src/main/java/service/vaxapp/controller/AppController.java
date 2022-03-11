@@ -2,6 +2,7 @@ package service.vaxapp.controller;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,12 +20,12 @@ import service.vaxapp.model.Appointment;
 import service.vaxapp.model.AppointmentSlot;
 import service.vaxapp.model.User;
 import service.vaxapp.model.Vaccine;
+import service.vaxapp.model.VaccineCentre;
 import service.vaxapp.repository.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
 
 @Controller
 public class AppController {
@@ -88,11 +89,37 @@ public class AppController {
             return "redirect:/";
         }
 
-        Appointment app = new Appointment(appSlot.getVaccineCentre(), appSlot.getDate(), appSlot.getStartTime(), userSession.getUser(), "pending");
+        Appointment app = new Appointment(appSlot.getVaccineCentre(), appSlot.getDate(), appSlot.getStartTime(),
+                userSession.getUser(), "pending");
         appointmentRepository.save(app);
         appointmentSlotRepository.delete(appSlot);
 
         return "redirect:/profile";
+    }
+
+    @PostMapping(value = "/assign-vaccine")
+    public String assignVaccine(@RequestParam Map<String, String> body, Model model) {
+        if (!userSession.isLoggedIn()) {
+            return "redirect:/login";
+        }
+
+        if (!userSession.getUser().isAdmin()) {
+            // Hacks detected!
+            return "redirect:/login";
+        }
+
+        LocalDate vaxDate = LocalDate.parse(body.get("date"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        Integer userId = Integer.valueOf(body.get("user_id"));
+        Integer centreId = Integer.valueOf(body.get("center_id"));
+        String vaxType = body.get("vaccine");
+
+        User vaxUser = userRepository.findById(userId).get();
+        VaccineCentre vaxCentre = vaccineCentreRepository.findById(centreId).get();
+
+        Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
+        vaccineRepository.save(vax);
+
+        return "redirect:/profile/" + userId;
     }
 
     @GetMapping("/stats")
@@ -206,7 +233,12 @@ public class AppController {
         List<Appointment> apps = appointmentRepository.findByUser(userSession.getUserId());
         Collections.reverse(apps);
 
+        List<Vaccine> vaxes = vaccineRepository.findByUser(userSession.getUserId());
+        Collections.reverse(vaxes);
+
+        model.addAttribute("vaccineCenters", vaccineCentreRepository.findAll());
         model.addAttribute("appointments", apps);
+        model.addAttribute("vaccines", vaxes);
         model.addAttribute("userSession", userSession);
         model.addAttribute("userProfile", userSession.getUser());
         model.addAttribute("isSelf", true);
@@ -230,9 +262,15 @@ public class AppController {
                 // admins can see everybody's appointments
                 List<Appointment> apps = appointmentRepository.findByUser(user.get().getId());
                 Collections.reverse(apps);
+
+                List<Vaccine> vaxes = vaccineRepository.findByUser(user.get().getId());
+                Collections.reverse(vaxes);
+
                 model.addAttribute("appointments", apps);
+                model.addAttribute("vaccines", vaxes);
             }
 
+            model.addAttribute("vaccineCenters", vaccineCentreRepository.findAll());
             model.addAttribute("userSession", userSession);
             model.addAttribute("userProfile", user.get());
             return "profile";

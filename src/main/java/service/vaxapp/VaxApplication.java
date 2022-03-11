@@ -12,6 +12,7 @@ import service.vaxapp.repository.AppointmentRepository;
 import service.vaxapp.repository.AppointmentSlotRepository;
 import service.vaxapp.repository.UserRepository;
 import service.vaxapp.repository.VaccineCentreRepository;
+import service.vaxapp.repository.VaccineRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,12 +24,13 @@ public class VaxApplication {
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner(VaccineCentreRepository vaccineCentreRepo, AppointmentSlotRepository appointmentSlotRepo, UserRepository userRepo, AppointmentRepository appointmentRepo) {
+    public CommandLineRunner commandLineRunner(VaccineCentreRepository vaccineCentreRepo, VaccineRepository vaccineRepo, AppointmentSlotRepository appointmentSlotRepo, UserRepository userRepo, AppointmentRepository appointmentRepo) {
         return args -> {
             System.out.println("VaxApp started");
 
             appointmentSlotRepo.deleteAll();
             appointmentRepo.deleteAll();
+            vaccineRepo.deleteAll();
             vaccineCentreRepo.deleteAll();
             userRepo.deleteAll();
 
