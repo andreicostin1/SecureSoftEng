@@ -121,7 +121,7 @@ public class AppController {
         model.addAttribute("userSession", userSession);
         model.addAttribute("totalDoses", vaccineRepository.count());
         List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
-        long male = users.stream().filter(x -> x.getGender().equals("male")).count();
+        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("male")).count();
         long female = users.size() - male;
         Map<Integer, Long> ageRanges = new TreeMap<>();
 
