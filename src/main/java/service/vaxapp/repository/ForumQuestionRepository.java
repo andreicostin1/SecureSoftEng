@@ -12,6 +12,6 @@ import java.util.List;
 
 @Repository
 public interface ForumQuestionRepository extends JpaRepository<ForumQuestion, Integer> {
-    @Query(value = "SELECT * FROM appointment WHERE user_id=:userId", nativeQuery = true)
+    @Query(value = "SELECT * FROM forum_question WHERE user_id=:userId", nativeQuery = true)
     List<Appointment> findByUser(Integer userId);
 }
