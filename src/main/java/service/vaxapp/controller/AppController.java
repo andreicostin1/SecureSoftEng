@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import service.vaxapp.model.ForumAnswer;
@@ -183,7 +182,6 @@ public class AppController {
 
     @GetMapping("/login")
     public String login(Model model) {
-        // TODO - add DB retrieval logic
         model.addAttribute("userSession", userSession);
         return "login";
     }
@@ -201,7 +199,6 @@ public class AppController {
 
     @GetMapping("/register")
     public String register(Model model) {
-        // TODO - add DB retrieval logic
         model.addAttribute("userSession", userSession);
         return "register";
     }
@@ -229,29 +226,31 @@ public class AppController {
         // Retrieve all questions and answers from database
         List<ForumQuestion> questions = forumQuestionRepository.findAll();
         model.addAttribute("questions", questions);
-        // TODO - add DB retrieval logic + authorization check
         model.addAttribute("userSession", userSession);
         return "forum";
     }
 
     @GetMapping("/ask-a-question")
     public String askAQuestion(Model model) {
-        // TODO
-        // If admin, return to index page
-        // If user, return ask a question page
+        // If not logged in or admin, return to forum
+        if (!userSession.isLoggedIn()
+                || (userSession.isLoggedIn() && userSession.getUser() != null && userSession.getUser().isAdmin())) {
+            return "redirect:/forum";
+        }
+        // If user, return ask-a-question page
         model.addAttribute("userSession", userSession);
         return "ask-a-question";
     }
 
     @PostMapping("/ask-a-question")
-    public String askAQuestion(@RequestBody Question question, Model model) {
+    public String askAQuestion(@RequestParam String title, @RequestParam String details, Model model) {
         // If user is not logged in or is admin
         if (!userSession.isLoggedIn() || userSession.getUser().isAdmin()) {
             return "redirect:/forum";
         }
 
         // Create new question entry in db
-        ForumQuestion newQuestion = new ForumQuestion(question.title, question.details, question.dateSubmitted);
+        ForumQuestion newQuestion = new ForumQuestion(title, details, getDateSubmitted());
         newQuestion.setUser(userSession.getUser());
 
         // Add question to database
@@ -259,6 +258,54 @@ public class AppController {
 
         // Redirect to new question page
         return "redirect:/question?id=" + newQuestion.getId();
+    }
+
+    @GetMapping("/question")
+    public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
+        // Retrieve question
+        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
+        if (question.isPresent()) {
+            // Return question information
+            model.addAttribute("question", question.get());
+            model.addAttribute("userSession", userSession);
+            return "question.html";
+        } else {
+            // Redirect if question not found
+            return "redirect:/forum";
+        }
+    }
+
+    @PostMapping("/question")
+    public String answerQuestion(
+            @RequestParam String body, @RequestParam String id, Model model) {
+        // Retrieving question
+        try {
+            Integer questionId = Integer.parseInt(id);
+            Optional<ForumQuestion> question = forumQuestionRepository.findById(questionId);
+            if (question.isPresent()) {
+                // If user is admin
+                if (userSession.isLoggedIn() && userSession.getUser() != null && userSession.getUser().isAdmin()) {
+                    // Create new answer entry in db
+                    ForumAnswer newAnswer = new ForumAnswer(body, getDateSubmitted());
+                    // Save forum question and answer
+                    newAnswer.setAdmin(userSession.getUser());
+                    newAnswer.setQuestion(question.get());
+                    forumAnswerRepository.save(newAnswer);
+                    question.get().addAnswer(newAnswer);
+                    forumQuestionRepository.save(question.get());
+
+                    // Redirect to updated question page
+                    return "redirect:/question?id=" + question.get().getId();
+                } else {
+                    // Redirect to unchanged same question page
+                    return "redirect:/question?id=" + question.get().getId();
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            return "redirect:/forum";
+        }
+        return "redirect:/forum";
     }
 
     @GetMapping("/profile")
@@ -364,76 +411,17 @@ public class AppController {
         return "redirect:/profile";
     }
 
-    @GetMapping("/question")
-    public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
-        // Retrieve question
-        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
-        if (question.isPresent()) {
-            // Return question information
-            model.addAttribute("question", question.get());
-            model.addAttribute("userSession", userSession);
-            return "question.html";
-        } else {
-            // Redirect if question not found
-            return "redirect:/forum";
-        }
-    }
-
-    @PostMapping("/question")
-    public String answerQuestion(@RequestParam(name = "id") Integer id,
-            @RequestBody Answer answer, Model model) {
-        // Retrieving question
-        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
-        if (question.isPresent()) {
-            // If user is admin
-            if (userSession.isLoggedIn() && userSession.getUser() != null && userSession.getUser().isAdmin()) {
-                // Create new answer entry in db
-                ForumAnswer newAnswer = new ForumAnswer(answer.body, answer.dateSubmitted);
-                // Save forum question and answer
-                newAnswer.setAdmin(userSession.getUser());
-                newAnswer.setQuestion(question.get());
-                forumAnswerRepository.save(newAnswer);
-                question.get().addAnswer(newAnswer);
-                forumQuestionRepository.save(question.get());
-
-                // Return new question information
-                return "redirect:/question?id=" + question.get().getId();
-            } else {
-                // Return same question information
-                return "redirect:/question?id=" + question.get().getId();
-            }
-        } else {
-            return "redirect:/forum";
-        }
-    }
-
     /**
      * /########################
      * <p>
-     * DTOs
+     * Helpers
      * </p>
      * /#######################
      */
 
-    static class Question {
-        public String title;
-        public String details;
-        public String dateSubmitted;
-
-        public Question(String title, String details, String dateSubmitted) {
-            this.title = title;
-            this.details = details;
-            this.dateSubmitted = dateSubmitted;
-        }
-    }
-
-    static class Answer {
-        public String body;
-        public String dateSubmitted;
-
-        public Answer(String body, String dateSubmitted) {
-            this.body = body;
-            this.dateSubmitted = dateSubmitted;
-        }
+    private String getDateSubmitted() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return currentDate.format(formatter);
     }
 }

@@ -17,15 +17,9 @@
                   Our staff is here 24/7 to make sure you have all the facts!
                 </h6>
 
-                <form method="POST" id="questionSubmitForm">
+                <form role="form" method="post" action="/ask-a-question">
                   <div class="form-group">
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="question"
-                      placeholder="Question"
-                      id="title"
-                    />
+                    <input type="text" class="form-control" placeholder="Question" id="title" name="title" />
                   </div>
                   <div class="form-group">
                     <textarea
@@ -45,34 +39,5 @@
       </div>
       <footer th:insert="fragments/footer :: footer"></footer>
     </div>
-
-    <script>
-      window.onload = () => {
-        document.getElementById("questionSubmitForm").addEventListener("submit", async (event) => {
-          event.preventDefault();
-          const title = document.getElementById("title").value;
-          if (title !== "") {
-            const details = document.getElementById("details").value;
-            const currentDate = new Date();
-            const year = currentDate.getFullYear();
-            let month = currentDate.getMonth() + 1;
-            let day = currentDate.getDate();
-            if (day < 10) day = "0" + day;
-            if (month < 10) month = "0" + month;
-            await fetch("/ask-a-question", {
-              method: "POST",
-              body: JSON.stringify({
-                title: `${title}`,
-                details: `${details}`,
-                dateSubmitted: `${day}/${month}/${year}`,
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-          }
-        });
-      };
-    </script>
   </body>
 </html>
