@@ -27,7 +27,7 @@ public class Appointment {
     private String status; // one of "pending", "cancelled", "done"
 
     // manye-to-one relationship (many appointments can take place in a centre)
-    @ManyToOne(targetEntity = VaccineCentre.class, cascade = CascadeType.ALL)
+    @ManyToOne
     private VaccineCentre vaccineCentre;
 
     // Bidirectional many-to-one relationship (A user may have multiple vaccine

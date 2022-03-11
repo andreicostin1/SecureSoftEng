@@ -16,26 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import service.vaxapp.model.ForumAnswer;
-import service.vaxapp.model.ForumQuestion;
-import service.vaxapp.model.User;
-import service.vaxapp.repository.AppointmentRepository;
-import service.vaxapp.repository.ForumAnswerRepository;
-import service.vaxapp.repository.ForumQuestionRepository;
-import service.vaxapp.repository.UserRepository;
-import service.vaxapp.repository.VaccineCentreRepository;
-import service.vaxapp.repository.VaccineRepository;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import service.vaxapp.UserSession;
-import service.vaxapp.model.Appointment;
-import service.vaxapp.model.AppointmentSlot;
-import service.vaxapp.model.Vaccine;
-import service.vaxapp.model.VaccineCentre;
+import service.vaxapp.model.*;
 import service.vaxapp.repository.*;
 
 import java.util.*;
@@ -121,36 +105,37 @@ public class AppController {
 
     @GetMapping("/stats")
     public String statistics(Model model) {
-        model.addAttribute("dosesByNationality", userRepository.countByNationality("Ireland").size());
-        model.addAttribute("country", "Irish");
-        getStats(model);
+        getStats(model, "irish");
         return "stats.html";
     }
 
-    private void getStats(Model model) {
+    private void getStats(Model model, String country) {
         model.addAttribute("userSession", userSession);
         model.addAttribute("totalDoses", vaccineRepository.count());
         List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
-        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("male")).count();
-        long female = users.size() - male;
-        Map<Integer, Long> ageRanges = new TreeMap<>();
 
-        for (AtomicInteger i = new AtomicInteger(0); i.get() <= 8; i.incrementAndGet()) {
-            ageRanges.put(i.get() * 10, users.stream().filter(x -> x.getAge() / 10 == i.get()).count());
+        model.addAttribute("dosesByNationality",
+                users.stream().distinct().filter(x -> x.getNationality().equalsIgnoreCase(country)).count());
+        model.addAttribute("country", country);
+
+        long total = users.size();
+        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("male")).count();
+        long female = total - male;
+        Map<Integer, Double> ageRanges = new TreeMap<>();
+
+        for (AtomicInteger i = new AtomicInteger(1); i.get() <= 8; i.incrementAndGet()) {
+            long count = users.stream().filter(x -> x.getAge() / 10 == i.get()).count();
+            ageRanges.put(i.get() * 10, count == 0 ? 0.0 : count / total * 100);
         }
 
-        ageRanges.forEach((k, v) -> v = v / userRepository.count());
-
         model.addAttribute("agerange", ageRanges);
-        model.addAttribute("maleDosePercent", male / userRepository.count());
-        model.addAttribute("femaleDosePercent", female / userRepository.count());
+        model.addAttribute("maleDosePercent", male * 100.0 / (double) total);
+        model.addAttribute("femaleDosePercent", female * 100.0 / (double) total);
     }
 
     @PostMapping("/stats")
     public String statistics(Model model, @RequestParam("nationality") String country) {
-        model.addAttribute("dosesByNationality", userRepository.countByNationality(country).size());
-        model.addAttribute("country", country);
-        getStats(model);
+        getStats(model, country);
         return "stats.html";
     }
 
@@ -246,8 +231,7 @@ public class AppController {
         }
 
         // Create new question entry in db
-        ForumQuestion newQuestion = new ForumQuestion(title, details, getDateSubmitted());
-        newQuestion.setUser(userSession.getUser());
+        ForumQuestion newQuestion = new ForumQuestion(title, details, getDateSubmitted(), userSession.getUser());
 
         // Add question to database
         forumQuestionRepository.save(newQuestion);
@@ -259,8 +243,8 @@ public class AppController {
     }
 
     @PostMapping("/question")
-    public String answerQuestion(
-            @RequestParam String body, @RequestParam String id, Model model, RedirectAttributes redirectAttributes) {
+    public String answerQuestion(@RequestParam String body, @RequestParam String id, Model model,
+            RedirectAttributes redirectAttributes) {
         // Retrieving question
         try {
             Integer questionId = Integer.parseInt(id);

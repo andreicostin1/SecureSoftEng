@@ -13,8 +13,8 @@ import java.util.List;
 @Table(name = "users")
 public class User {
     @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     @Column(name = "user_pps", unique = true)
     private String PPS;
     @Column(name = "full_name")
@@ -36,17 +36,17 @@ public class User {
     private Boolean admin = false;
 
     // Bidirectional one-to-many relationship (One user may get multiple vaccines)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Vaccine> vaccines;
 
     // Bidirectional one-to-many relationship (One user may ask multiple forum
     // questions)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<ForumQuestion> questions;
 
     // Bidirectional one-to-many relationship (One user may be assigned multiple
     // appointments)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Appointment> appointments;
 
     public User() {

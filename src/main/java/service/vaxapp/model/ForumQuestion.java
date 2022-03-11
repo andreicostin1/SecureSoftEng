@@ -40,10 +40,11 @@ public class ForumQuestion {
     public ForumQuestion() {
     }
 
-    public ForumQuestion(String title, String details, String dateSubmitted) {
+    public ForumQuestion(String title, String details, String dateSubmitted, User user) {
         this.title = title;
         this.details = details;
         this.dateSubmitted = dateSubmitted;
+        this.user = user;
     }
 
     public Integer getId() {

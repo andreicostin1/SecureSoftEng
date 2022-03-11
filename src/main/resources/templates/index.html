@@ -94,30 +94,50 @@
         }
 
         selectCenter.addEventListener('change', (e) => {
-            applySlots(e.target.value);
+            applyDateSlots(e.target.value);
         });
 
-        function applySlots(centerId) {
-            selectDate.innerHTML = '';
-            selectTime.innerHTML = '';
-            const centerAppSlots = appSlots.filter((slot) => slot.vaccineCentre.id == centerId);
+        selectDate.addEventListener('change', (e) => {
+            applyTimeSlots(e.target.value);
+        });
 
-            for (const slot of centerAppSlots) {
+        function applyDateSlots(centerId) {
+            selectDate.innerHTML = '';
+            const centerAppSlots = appSlots.filter((slot) => slot.vaccineCentre.id == centerId);
+            const centerDates = [...new Set(centerAppSlots.map((slot) => slot.date))];
+
+            for (const date of centerDates) {
                 const opt = document.createElement('option');
-                opt.value = slot.date;
-                opt.innerHTML = slot.date;
+                opt.value = date;
+                opt.innerHTML = date;
                 selectDate.appendChild(opt);
 
-                const endDate = new Date(new Date(slot.date + ' ' + slot.startTime).getTime() + 15 * 60000);
+                // const endDate = new Date(new Date(slot.date + ' ' + slot.startTime).getTime() + 15 * 60000);
 
+                // const opt2 = document.createElement('option');
+                // opt2.value = slot.startTime;
+                // opt2.innerHTML = slot.startTime.substring(0, slot.startTime.length - 3) + ' - ' + endDate.getHours() + ':' + endDate.getMinutes();
+                // selectTime.appendChild(opt2);
+            }
+        }
+
+        function applyTimeSlots(date) {
+            selectTime.innerHTML = '';
+            const centerId = selectCenter.value;
+            const timeSlots = appSlots.filter((slot) => slot.vaccineCentre.id == centerId && slot.date == date);
+
+            for (const slot of timeSlots) {
+                const endDate = new Date(new Date(slot.date + ' ' + slot.startTime).getTime() + 15 * 60000);
+                console.log(endDate.getTime());
                 const opt2 = document.createElement('option');
                 opt2.value = slot.startTime;
-                opt2.innerHTML = slot.startTime.substring(0, slot.startTime.length - 3) + ' - ' + endDate.getHours() + ':' + endDate.getMinutes();
+                opt2.innerHTML = slot.startTime.substring(0, slot.startTime.length - 3) + ' - ' + endDate.getHours() + ':' + (endDate.getMinutes() || '00');
                 selectTime.appendChild(opt2);
             }
         }
 
-        applySlots(selectCenter.value);
+        applyDateSlots(selectCenter.value);
+        applyTimeSlots(selectDate.value);
     </script>
 </body>
 
