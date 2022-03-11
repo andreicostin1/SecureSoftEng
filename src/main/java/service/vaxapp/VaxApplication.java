@@ -28,12 +28,6 @@ public class VaxApplication {
         return args -> {
             System.out.println("VaxApp started");
 
-            appointmentSlotRepo.deleteAll();
-            appointmentRepo.deleteAll();
-            vaccineRepo.deleteAll();
-            vaccineCentreRepo.deleteAll();
-            userRepo.deleteAll();
-
             User admin = new User("1234", "Vladolf Putler", "Kremlin", "", "admin@vaxapp.com", "07/10/1952", "Russian", "Male", true);
             User dragos = new User("123", "Dragos", "Bucharest", "", "dragos@vaxapp.com", "05/06/1999", "Romanian", "Male", false);
             userRepo.save(admin);
