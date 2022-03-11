@@ -83,6 +83,7 @@ If port 8080 is already in use, you will need to modify the `application.propert
 - Andrei Costin
   - Partial login/register
   - Statistics
+  - Profile activity
 - Andra Antal-Berbecaru
   - Initial Spring project setup
   - Partial database setup
