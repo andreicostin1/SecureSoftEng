@@ -11,7 +11,13 @@
           <div class="container shape-container py-lg text-white">
             <div class="d-flex mb-5">
               <h3 class="mb-0 mr-auto">Asked questions</h3>
-              <a href="/ask-a-question" class="btn btn-primary"> Ask a question </a>
+              <a
+                href="/ask-a-question"
+                class="btn btn-primary"
+                th:hidden="${!userSession.isLoggedIn() || userSession.getUser().isAdmin()}"
+              >
+                Ask a question
+              </a>
             </div>
 
             <div
@@ -24,7 +30,7 @@
                 <div class="row align-items-center">
                   <div class="mr-auto">
                     <a th:href="@{/question(id=${question.id})}">
-                      <h5 class="card-title mb-3" th:text="${question.details}"></h5>
+                      <h5 class="card-title mb-3" th:text="${question.title}"></h5>
                     </a>
                     <h6 class="card-subtitle mb-0">
                       <a

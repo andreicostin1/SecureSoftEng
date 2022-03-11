@@ -137,11 +137,10 @@ public class AppController {
     }
 
     @PostMapping("/ask-a-question")
-    @ResponseBody
-    public Integer askAQuestion(@RequestBody Question question, Model model) {
-        // User not logged in || User is Admin
+    public String askAQuestion(@RequestBody Question question, Model model) {
+        // If user is not logged in or is admin
         if (!userSession.isLoggedIn() || userSession.getUser().isAdmin()) {
-            return null;
+            return "redirect:/forum";
         }
 
         // Create new question entry in db
@@ -151,8 +150,8 @@ public class AppController {
         // Add question to database
         forumQuestionRepository.save(newQuestion);
 
-        // Return new question
-        return newQuestion.getId();
+        // Redirect to new question page
+        return "redirect:/question?id=" + newQuestion.getId();
     }
 
     @GetMapping("/profile")
@@ -189,42 +188,46 @@ public class AppController {
 
     @GetMapping("/question")
     public String getQuestionById(@RequestParam(name = "id") Integer id, Model model) {
+        // Retrieve question
         Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
         if (question.isPresent()) {
+            // Return question information
             model.addAttribute("question", question.get());
             model.addAttribute("userSession", userSession);
             return "question.html";
         } else {
+            // Redirect if question not found
             return "redirect:/forum";
         }
     }
 
-    // @PostMapping("/question")
-    // public String answerQuestion(@RequestParam(name = "id") Integer id,
-    // @RequestBody Answer answer, Model model) {
-    // // TODO
-    // // Retrieve user account using session
-    // // If admin, add answer to databse for the question with id and save answer
-    // and
-    // // question updates to db
-    // // If user, do not allow answer & return redirect with error
-    // Optional<Admin> admin = adminRepository.findById("987654AB"); // TODO - use
-    // session instead
-    // Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
-    // if (admin.isPresent() && question.isPresent()) {
-    // ForumAnswer newAnswer = new ForumAnswer(answer.body, answer.dateSubmitted);
-    // newAnswer.setAdmin(admin.get());
-    // newAnswer.setQuestion(question.get());
-    // question.get().addAnswer(newAnswer);
-    // // Save forum question and answer
-    // forumAnswerRepository.save(newAnswer);
-    // forumQuestionRepository.save(question.get());
-    // model.addAttribute("question", question);
-    // return "question.html";
-    // }
+    @PostMapping("/question")
+    public String answerQuestion(@RequestParam(name = "id") Integer id,
+            @RequestBody Answer answer, Model model) {
+        // Retrieving question
+        Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
+        if (question.isPresent()) {
+            // If user is admin
+            if (userSession.isLoggedIn() && userSession.getUser() != null && userSession.getUser().isAdmin()) {
+                // Create new answer entry in db
+                ForumAnswer newAnswer = new ForumAnswer(answer.body, answer.dateSubmitted);
+                // Save forum question and answer
+                newAnswer.setAdmin(userSession.getUser());
+                newAnswer.setQuestion(question.get());
+                forumAnswerRepository.save(newAnswer);
+                question.get().addAnswer(newAnswer);
+                forumQuestionRepository.save(question.get());
 
-    // return "ask-a-question.html";
-    // }
+                // Return new question information
+                return "redirect:/question?id=" + question.get().getId();
+            } else {
+                // Return same question information
+                return "redirect:/question?id=" + question.get().getId();
+            }
+        } else {
+            return "redirect:/forum";
+        }
+    }
 
     /**
      * /########################

@@ -1,37 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
   <head th:insert="fragments/head :: head"></head>
-  <head>
-    <script>
-      window.onload = () => {
-        document.getElementById("questionSubmitForm").addEventListener("submit", async (event) => {
-          event.preventDefault();
-          const title = document.getElementById("title").value;
-          const details = document.getElementById("details").value;
-          const currentDate = new Date();
-          const year = currentDate.getFullYear();
-          let month = currentDate.getMonth() + 1;
-          let day = currentDate.getDate();
-          if (day < 10) day = "0" + day;
-          if (month < 10) month = "0" + month;
-          console.log("TITLE: ", title, ", DETAILS: ", details, ", DATE: ", day, "/", month, "/", "year");
-          await fetch("/ask-a-question", {
-            method: "POST",
-            body: JSON.stringify({
-              title: `${title}`,
-              details: `${details}`,
-              dateSubmitted: `${day}/${month}/${year}}`,
-            }),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }).then((res) => {
-            (window.location.href = `/question?id=${res.id}`), true;
-          });
-        });
-      };
-    </script>
-  </head>
 
   <body class="index-page">
     <div th:replace="fragments/navbar:: navbar"></div>
@@ -76,5 +45,34 @@
       </div>
       <footer th:insert="fragments/footer :: footer"></footer>
     </div>
+
+    <script>
+      window.onload = () => {
+        document.getElementById("questionSubmitForm").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const title = document.getElementById("title").value;
+          if (title !== "") {
+            const details = document.getElementById("details").value;
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            let month = currentDate.getMonth() + 1;
+            let day = currentDate.getDate();
+            if (day < 10) day = "0" + day;
+            if (month < 10) month = "0" + month;
+            await fetch("/ask-a-question", {
+              method: "POST",
+              body: JSON.stringify({
+                title: `${title}`,
+                details: `${details}`,
+                dateSubmitted: `${day}/${month}/${year}`,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+          }
+        });
+      };
+    </script>
   </body>
 </html>
