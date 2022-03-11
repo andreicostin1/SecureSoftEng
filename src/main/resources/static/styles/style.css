@@ -47,6 +47,10 @@
     height: 29px;
 }
 
+.card-profile-image img {
+    width: 75%;
+}
+
 /* Home page */
 #appointment-form {
     max-width: 300px;
