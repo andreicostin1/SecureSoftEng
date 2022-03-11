@@ -465,10 +465,6 @@ public class AppController {
             appointmentRepository.save(appointment);
             redirectAttributes.addFlashAttribute("success",
                     "The vaccine was recorded and a new appointment at least 3 weeks from now has been made for the user.");
-
-        } else if (vaccines != null && vaccines.size() > 1) {
-            redirectAttributes.addFlashAttribute("error", "A user can only receive 2 vaccine doses.");
-            return "redirect:/profile/" + userId;
         }
         // Save new vaccine
         Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
