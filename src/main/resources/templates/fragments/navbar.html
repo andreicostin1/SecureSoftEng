@@ -1,9 +1,5 @@
 <!-- Navbar -->
-<nav
-  th:fragment="navbar"
-  id="navbar-main"
-  class="navbar navbar-main navbar-expand-lg navbar-light navbar-transparent top-0 py-3"
->
+<nav th:fragment="navbar" id="navbar-main" class="navbar navbar-main navbar-expand-lg navbar-light navbar-transparent top-0 py-3">
   <div class="container">
     <a class="navbar-brand mr-lg-5" href="/">
       <img src="/images/logo.svg" />
@@ -68,13 +64,13 @@
 
       <ul th:if="${!userSession.isLoggedIn()}" class="navbar-nav align-items-lg-center ml-lg-auto">
         <li class="nav-item d-lg-block ml-lg-4">
-          <a href="/login" rel="noopener" class="btn btn-neutral btn-icon">
+          <a href="/" th:href="@{/login}" rel="noopener" class="btn btn-neutral btn-icon">
             <span class="btn-inner--icon"><i class="fa fa-user mr-2"></i></span>
             <span class="nav-link-inner--text">Sign in</span>
           </a>
         </li>
         <li class="nav-item d-lg-block">
-          <a href="/register" rel="noopener" class="btn btn-neutral-outline btn-success btn-icon">
+          <a href="/" th:href="@{/register}" rel="noopener" class="btn btn-neutral-outline btn-success btn-icon">
             <span class="btn-inner--icon"><i class="fa fa-plus mr-2"></i></span>
             <span class="nav-link-inner--text">Create account</span>
           </a>
