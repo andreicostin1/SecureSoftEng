@@ -34,6 +34,10 @@ public class User {
     @Column(nullable = false)
     @Type(type = "org.hibernate.type.NumericBooleanType")
     private Boolean admin = false;
+    @Column
+    private String password;
+    @Transient
+    private String passwordConfirm;
 
     // Bidirectional one-to-many relationship (One user may get multiple vaccines)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
@@ -53,7 +57,7 @@ public class User {
     }
 
     public User(String PPS, String fullName, String address, String phoneNumber, String email, String dateOfBirth,
-            String nationality, String gender, Boolean admin) {
+            String nationality, String gender, Boolean admin, String password) {
         this.PPS = PPS;
         this.fullName = fullName;
         this.address = address;
@@ -63,6 +67,7 @@ public class User {
         this.nationality = nationality;
         this.gender = gender;
         this.admin = admin;
+        this.password = password;
     }
 
     public Integer getId() {
@@ -140,5 +145,21 @@ public class User {
 
     public Boolean isAdmin() {
         return admin;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
+
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
     }
 }
