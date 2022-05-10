@@ -47,10 +47,6 @@ Ensure the database was successfully created using
 
 ### Run spring application
 
-Clone the repository into a directory of your choice using
-
-> `git clone`
-
 The project can be open in any IDE (we recommend VSCode or Intellij). To run it, use the following command:
 
 > `mvn clean install spring-boot:run`
