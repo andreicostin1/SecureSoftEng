@@ -28,7 +28,9 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public void autoLogin(String email, String password) {
+        System.out.println("Auto login with email = " + email + " and password = " + password);
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        System.out.println("Auto login UserDetails: " + userDetails);
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails, password, userDetails.getAuthorities());
 

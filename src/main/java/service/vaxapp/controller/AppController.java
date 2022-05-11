@@ -3,7 +3,6 @@ package service.vaxapp.controller;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +13,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -155,29 +156,21 @@ public class AppController {
     @GetMapping("/login")
     public String login(Model model, String error, String logout, RedirectAttributes redirectAttributes) {
         if (error != null)
-            redirectAttributes.addFlashAttribute("error", "Your username and password is invalid.");
+            model.addAttribute("error", "Your username and password is invalid.");
 
         if (logout != null)
-            redirectAttributes.addFlashAttribute("success", "You have been logged out successfully.");
+            model.addAttribute("logout", "You have been logged out successfully.");
+
+        User currentUser = getCurrentUser();
+        if (currentUser != null) {
+            userSession.setUserId(currentUser.getId());
+            redirectAttributes.addFlashAttribute("success", "Welcome, " + currentUser.getFullName() + "!");
+            return "redirect:/";
+        }
 
         model.addAttribute("userSession", userSession);
         return "login";
     }
-
-    // @PostMapping("/login")
-    // public String login(@RequestParam("email") String email,
-    // @RequestParam("password") String password, RedirectAttributes
-    // redirectAttributes) {
-    // User user = userRepository.findByCredentials(email, pps);
-    // if (user == null) {
-    // redirectAttributes.addFlashAttribute("error", "Wrong credentials.");
-    // return "redirect:/login";
-    // }
-    // userSession.setUserId(user.getId());
-    // redirectAttributes.addFlashAttribute("success", "Welcome, " +
-    // user.getFullName() + "!");
-    // return "redirect:/";
-    // }
 
     @GetMapping("/register")
     public String register(Model model) {
@@ -207,6 +200,7 @@ public class AppController {
         }
 
         userService.save(user);
+        securityService.autoLogin(user.getEmail(), user.getPasswordConfirm());
         redirectAttributes.addFlashAttribute("success", "Account created! You can sign in now.");
         return "redirect:/login";
     }
@@ -514,5 +508,13 @@ public class AppController {
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return currentDate.format(formatter);
+    }
+
+    private User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof String)
+            return null;
+        User user = userService.findByEmail(((UserDetails) principal).getUsername());
+        return user;
     }
 }
