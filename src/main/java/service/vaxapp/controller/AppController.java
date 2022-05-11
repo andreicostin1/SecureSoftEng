@@ -164,7 +164,9 @@ public class AppController {
         User currentUser = getCurrentUser();
         if (currentUser != null) {
             userSession.setUserId(currentUser.getId());
-            redirectAttributes.addFlashAttribute("success", "Welcome, " + currentUser.getFullName() + "!");
+            System.out.println("User logged in, the user: " + currentUser);
+            redirectAttributes.addFlashAttribute("success", "Welcome, " +
+                    currentUser.getFullName() + "!");
             return "redirect:/";
         }
 
