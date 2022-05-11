@@ -182,6 +182,8 @@ public class AppController {
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("userSession", userSession);
+        // Adding user attribute for BindingResult
+        model.addAttribute("user", new User());
         return "register";
     }
 

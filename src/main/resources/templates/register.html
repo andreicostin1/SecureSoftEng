@@ -27,22 +27,14 @@
                 <div class="card-body px-lg-5 py-lg-5 bg-white rounded-lg">
                   <h3>Welcome! 👋</h3>
                   <p>Please register below!</p>
-                  <form th:action="@{/register}" role="form" method="POST" th:object="${user}">
+                  <form th:action="@{/register}" method="POST" th:object="${user}">
                     <div class="form-group">
                       <div class="form-group">
                         <div class="input-group mb-3">
                           <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-envelope"></i></span>
                           </div>
-                          <input
-                            class="form-control"
-                            placeholder="Email"
-                            type="email"
-                            name="email"
-                            id="email"
-                            th:field="*{email}"
-                            required
-                          />
+                          <input class="form-control" placeholder="Email" type="email" id="email" th:field="*{email}" required />
                         </div>
                       </div>
 
@@ -55,13 +47,14 @@
                             class="form-control"
                             placeholder="Password"
                             type="password"
-                            name="password"
                             id="password"
                             th:field="*{password}"
                             required
                           />
+                          <div class="input-group-append">
+                            <span class="input-group-text"><i class="fa fa-eye" onclick="toggleVisibility('password')"></i></span>
+                          </div>
                         </div>
-                        <input type="checkbox" onclick="toggleVisibility('password')" />Show
                       </div>
 
                       <div class="form-group">
@@ -73,15 +66,17 @@
                             class="form-control"
                             placeholder="Confirm Password"
                             type="password"
-                            name="passwordConfirm"
                             id="passwordConfirm"
                             th:field="*{passwordConfirm}"
                             required
                           />
+                          <div class="input-group-append">
+                            <span class="input-group-text"
+                              ><i class="fa fa-eye" onclick="toggleVisibility('passwordConfirm')"></i
+                            ></span>
+                          </div>
                         </div>
-                        <input type="checkbox" onclick="toggleVisibility('passwordConfirm')" />Show
                       </div>
-
                       <div class="input-group mb-3">
                         <div class="input-group-prepend">
                           <span class="input-group-text"><i class="fa fa-user"></i></span>
@@ -90,7 +85,6 @@
                           class="form-control"
                           placeholder="Full Name"
                           type="text"
-                          name="fullName"
                           th:field="*{fullName}"
                           id="fullName"
                           required
@@ -103,7 +97,7 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text"><i class="fa fa-hashtag"></i></span>
                         </div>
-                        <input class="form-control" placeholder="PPS Number" type="text" name="PPS" th:field="*{PPS}" required />
+                        <input class="form-control" placeholder="PPS Number" type="text" th:field="*{PPS}" required />
                       </div>
                     </div>
 
@@ -112,14 +106,7 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text"><i class="fa fa-phone"></i></span>
                         </div>
-                        <input
-                          class="form-control"
-                          placeholder="Phone"
-                          type="text"
-                          name="phoneNumber"
-                          th:field="*{phoneNumber}"
-                          id="phoneNumber"
-                        />
+                        <input class="form-control" placeholder="Phone" type="text" th:field="*{phoneNumber}" id="phoneNumber" />
                       </div>
                     </div>
 
@@ -134,7 +121,6 @@
                           class="form-control"
                           placeholder="Address (City, Country)"
                           type="text"
-                          name="address"
                           th:field="*{address}"
                           id="address"
                           required
@@ -153,7 +139,6 @@
                           type="text"
                           class="form-control"
                           placeholder="Date of birth (dd/mm/yyyy)"
-                          name="dateOfBirth"
                           th:field="*{dateOfBirth}"
                           if="dateOfBirth"
                           required
@@ -168,7 +153,7 @@
                             <i class="fa fa-flag"></i>
                           </span>
                         </div>
-                        <select name="nationality" class="form-control" th:field="*{nationality}" id="nationality" required>
+                        <select class="form-control" th:field="*{nationality}" id="nationality" required>
                           <option value="">Nationality</option>
                           <option value="afghan">Afghan</option>
                           <option value="albanian">Albanian</option>
@@ -373,7 +358,7 @@
                             <i class="fa fa-venus-mars"></i>
                           </span>
                         </div>
-                        <select name="gender" class="form-control" th:field="*{gender}" id="gender" required>
+                        <select class="form-control" th:field="*{gender}" id="gender" required>
                           <option value="">Sex</option>
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
@@ -415,13 +400,21 @@
     </script>
     <script>
       function toggleVisibility(id) {
-        var input = document.getElementById(id);
+        var input = document.getElementById(id, event);
+        if (!event) {
+          event = window.event; // Older versions of IE
+        }
+
+        var icon = event.target || event.srcElement; // DOM uses 'target'; // older versions of IE use 'srcElement'
         if (input.type === "password") {
           input.type = "text";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
         } else {
           input.type = "password";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
         }
-        clear();
       }
     </script>
   </body>
