@@ -164,7 +164,6 @@ public class AppController {
         User currentUser = getCurrentUser();
         if (currentUser != null) {
             userSession.setUserId(currentUser.getId());
-            System.out.println("User logged in, the user: " + currentUser);
             redirectAttributes.addFlashAttribute("success", "Welcome, " +
                     currentUser.getFullName() + "!");
             return "redirect:/";
@@ -193,11 +192,9 @@ public class AppController {
             return "redirect:/register";
         }
 
-        System.out.println("In /register! User: " + user + ", bindingResult: " + bindingResult);
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Account could not be created. Invalid email or password.");
-            System.out.println("Binding result has errors... Errors: " + bindingResult.getAllErrors().get(0));
             return "redirect:/register";
         }
 

@@ -43,11 +43,6 @@ public class UserValidator implements Validator {
         final Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
                 Pattern.CASE_INSENSITIVE);
         Matcher matcher = emailPattern.matcher(email);
-        if (matcher.matches()) {
-            System.out.println("Email pattern valid!");
-        } else {
-            System.out.println("Email pattern invalid..");
-        }
         return matcher.matches();
     }
 
@@ -57,11 +52,6 @@ public class UserValidator implements Validator {
 
         Matcher matcher = pattern.matcher(password);
 
-        if (matcher.matches()) {
-            System.out.println("Password pattern valid!");
-        } else {
-            System.out.println("Password pattern invalid..");
-        }
         return matcher.matches();
 
         // (?=.*[a-z]) The string must contain at least 1 lowercase alphabetical
