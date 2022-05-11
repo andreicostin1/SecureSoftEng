@@ -1,9 +1,9 @@
 function CheckPasswordStrength(password) {
-  var password_strength = document.getElementById("password_strength");
+  var password_lock_icon = document.getElementById("password_lock_icon");
 
   //TextBox left blank.
   if (password.length == 0) {
-    password_strength.innerHTML = "";
+    password_lock_icon.style.color = rgb(173, 181, 189);
     return;
   }
 
@@ -34,31 +34,25 @@ function CheckPasswordStrength(password) {
   }
 
   //Display status.
-  var color = "";
-  var strength = "";
+  let color = "";
   switch (passed) {
     case 0:
     case 1:
-      strength = "Very Weak";
-      color = "darkred";
-      break;
-    case 2:
-      strength = "Weak";
       color = "red";
       break;
+    case 2:
+      color = "orange";
+      break;
     case 3:
-      strength = "Fair";
-      color = "darkorange";
+      color = "yellow";
       break;
     case 4:
-      strength = "Strong";
-      color = "green";
+      color = "greenyellow";
       break;
     case 5:
-      strength = "Very Strong";
-      color = "darkgreen";
+      color = "green";
       break;
   }
-  password_strength.innerHTML = strength;
-  password_strength.style.color = color;
+
+  password_lock_icon.style.color = color;
 }
