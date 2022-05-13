@@ -25,7 +25,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(User user) {
+        // Encrypt password
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
+        try {
+            // Encrypt sensitive information (PPS, phone number, date of birth)
+            user.setPPS(EncryptionService.encrypt(user.getPPS()));
+            user.setPhoneNumber(EncryptionService.encrypt(user.getPhoneNumber()));
+            user.setDateOfBirth(EncryptionService.encrypt(user.getDateOfBirth()));
+        } catch (Exception e) {
+            // TODO: add logging
+            System.out.println("Error occurred while encrypting sensitive dara. Error: " + e.getStackTrace());
+        }
         // user.setRoles(new HashSet<>(roleRepository.findAll()));
         userRepository.save(user);
     }
