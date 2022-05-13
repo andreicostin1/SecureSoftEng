@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByPPS(String PPS) {
-        return userRepository.findByPPS(PPS);
+        return userRepository.findUserByPPS(PPS);
     }
 
     @Override
