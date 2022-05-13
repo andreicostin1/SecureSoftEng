@@ -122,8 +122,8 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public int getAge() {
-        LocalDate birthday = LocalDate.parse(this.dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    public int getAge(String dateOfBirth) {
+        LocalDate birthday = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         return Period.between(birthday, LocalDate.now()).getYears();
     }
 

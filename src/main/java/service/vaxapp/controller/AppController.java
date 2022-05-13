@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import service.vaxapp.UserSession;
 import service.vaxapp.model.*;
 import service.vaxapp.repository.*;
+import service.vaxapp.service.EncryptionService;
 import service.vaxapp.service.SecurityService;
 import service.vaxapp.service.UserService;
 import service.vaxapp.validator.UserValidator;
@@ -120,30 +121,6 @@ public class AppController {
         return "stats.html";
     }
 
-    private void getStats(Model model, String country) {
-        model.addAttribute("userSession", userSession);
-        model.addAttribute("totalDoses", vaccineRepository.count());
-        List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
-
-        model.addAttribute("dosesByNationality",
-                users.stream().distinct().filter(x -> x.getNationality().equalsIgnoreCase(country)).count());
-        model.addAttribute("country", country);
-
-        long total = users.size();
-        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("male")).count();
-        long female = total - male;
-        Map<Integer, Double> ageRanges = new TreeMap<>();
-
-        for (AtomicInteger i = new AtomicInteger(1); i.get() <= 8; i.incrementAndGet()) {
-            long count = users.stream().filter(x -> x.getAge() / 10 == i.get()).count();
-            ageRanges.put(i.get() * 10, count == 0 ? 0.0 : count / total * 100);
-        }
-
-        model.addAttribute("agerange", ageRanges);
-        model.addAttribute("maleDosePercent", male * 100.0 / (double) total);
-        model.addAttribute("femaleDosePercent", female * 100.0 / (double) total);
-    }
-
     @PostMapping("/stats")
     public String statistics(Model model, @RequestParam("nationality") String country) {
         getStats(model, country);
@@ -163,6 +140,11 @@ public class AppController {
 
         User currentUser = getCurrentUser();
         if (currentUser != null) {
+            if (decryptAndSetSensitiveData(currentUser) == null) {
+                model.addAttribute("userSession", userSession);
+                return "login";
+            }
+
             userSession.setUserId(currentUser.getId());
             redirectAttributes.addFlashAttribute("success", "Welcome, " +
                     currentUser.getFullName() + "!");
@@ -327,6 +309,12 @@ public class AppController {
                 return "404";
             }
 
+            User decryptedUser = decryptAndSetSensitiveData(user.get());
+
+            if (decryptedUser == null) {
+                return "404";
+            }
+
             List<Vaccine> vaxes = vaccineRepository.findByUser(user.get().getId());
 
             if (userSession.isLoggedIn() && userSession.getUser().isAdmin()) {
@@ -341,10 +329,10 @@ public class AppController {
 
             model.addAttribute("vaccineCenters", vaccineCentreRepository.findAll());
             model.addAttribute("userSession", userSession);
-            model.addAttribute("userProfile", user.get());
-            model.addAttribute("userQuestions", forumQuestionRepository.findByUser(user.get().getId()).size());
+            model.addAttribute("userProfile", decryptedUser);
+            model.addAttribute("userQuestions", forumQuestionRepository.findByUser(decryptedUser.getId()).size());
             model.addAttribute("userDoses", vaxes.size());
-            model.addAttribute("userAppts", appointmentRepository.findByUser(user.get().getId()).size());
+            model.addAttribute("userAppts", appointmentRepository.findByUser(decryptedUser.getId()).size());
             return "profile";
         } catch (NumberFormatException ex) {
             return "404";
@@ -410,10 +398,20 @@ public class AppController {
     }
 
     @PostMapping(value = "/find-user")
-    public String findUser(@RequestParam Map<String, String> body, Model model) {
-        String input = body.get("input");
+    public String findUser(@RequestParam Map<String, String> body, Model model, RedirectAttributes redirectAttributes) {
+        String fullName = body.get("fullName");
+        String pps = body.get("pps");
+        User user = null;
 
-        User user = userRepository.findByPPSorName(input);
+        if (fullName.isEmpty() && pps.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "One of PPS or Full Name is needed to search.");
+        } else if (!fullName.isEmpty()) {
+            user = userRepository.findByFullBName(fullName);
+
+        } else if (!pps.isEmpty()) {
+            user = userRepository.findUserByPPS(pps);
+        }
+
         if (user == null) {
             return "redirect:/dashboard";
         }
@@ -514,6 +512,57 @@ public class AppController {
         if (principal instanceof String)
             return null;
         User user = userService.findByEmail(((UserDetails) principal).getUsername());
+        return user;
+    }
+
+    private void getStats(Model model, String country) {
+        model.addAttribute("userSession", userSession);
+        model.addAttribute("totalDoses", vaccineRepository.count());
+        List<User> users = vaccineRepository.findAll().stream().map(Vaccine::getUser).collect(Collectors.toList());
+
+        model.addAttribute("dosesByNationality",
+                users.stream().distinct().filter(x -> x.getNationality().equalsIgnoreCase(country)).count());
+        model.addAttribute("country", country);
+
+        long total = users.size();
+        long male = users.stream().filter(x -> x.getGender().equalsIgnoreCase("male")).count();
+        long female = total - male;
+        Map<Integer, Double> ageRanges = new TreeMap<>();
+
+        for (AtomicInteger i = new AtomicInteger(1); i.get() <= 8; i.incrementAndGet()) {
+            long count = users.stream().filter(x -> {
+                try {
+                    String decodedDateOfBirthString = EncryptionService.decrypt(x.getDateOfBirth());
+                    return x.getAge(decodedDateOfBirthString) / 10 == i.get();
+                } catch (Exception e) {
+                    // TODO: add logging
+                    System.out.println("Error occurred while decoding dob. Error: " + e.getStackTrace());
+                    return false;
+                }
+            }).count();
+            ageRanges.put(i.get() * 10, count == 0 ? 0.0 : count / total * 100);
+        }
+
+        model.addAttribute("agerange", ageRanges);
+        model.addAttribute("maleDosePercent", male * 100.0 / (double) total);
+        model.addAttribute("femaleDosePercent", female * 100.0 / (double) total);
+    }
+
+    private User decryptAndSetSensitiveData(User user) {
+        try {
+            // Decrypt data
+            String decodedDateOfBirth = EncryptionService.decrypt(user.getDateOfBirth());
+            String decodedPPS = EncryptionService.decrypt(user.getPPS());
+            String decodedPhoneNumber = EncryptionService.decrypt(user.getPhoneNumber());
+            // Set data in user
+            user.setDateOfBirth(decodedDateOfBirth);
+            user.setPPS(decodedPPS);
+            user.setPhoneNumber(decodedPhoneNumber);
+        } catch (Exception e) {
+            // TODO: Add logging
+            System.out.println("An error occurred while trying to decrypt sensitive data. Error: " + e.getStackTrace());
+            return null;
+        }
         return user;
     }
 }
