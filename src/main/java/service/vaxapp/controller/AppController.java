@@ -3,7 +3,6 @@ package service.vaxapp.controller;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,13 +13,19 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import service.vaxapp.UserSession;
 import service.vaxapp.model.*;
 import service.vaxapp.repository.*;
+import service.vaxapp.service.SecurityService;
+import service.vaxapp.service.UserService;
+import service.vaxapp.validator.UserValidator;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,11 +42,17 @@ public class AppController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserValidator userValidator;
+    @Autowired
+    private UserService userService;
+    @Autowired
     private VaccineCentreRepository vaccineCentreRepository;
     @Autowired
     private VaccineRepository vaccineRepository;
     @Autowired
     private AppointmentSlotRepository appointmentSlotRepository;
+    @Autowired
+    private SecurityService securityService;
 
     @Autowired
     private UserSession userSession;
@@ -143,53 +154,52 @@ public class AppController {
      * User Area
      */
     @GetMapping("/login")
-    public String login(Model model) {
+    public String login(Model model, String error, String logout, RedirectAttributes redirectAttributes) {
+        if (error != null)
+            model.addAttribute("error", "Your username and password is invalid.");
+
+        if (logout != null)
+            model.addAttribute("logout", "You have been logged out successfully.");
+
+        User currentUser = getCurrentUser();
+        if (currentUser != null) {
+            userSession.setUserId(currentUser.getId());
+            redirectAttributes.addFlashAttribute("success", "Welcome, " +
+                    currentUser.getFullName() + "!");
+            return "redirect:/";
+        }
+
         model.addAttribute("userSession", userSession);
         return "login";
-    }
-
-    @PostMapping("/login")
-    public String login(@RequestParam("email") String email, @RequestParam("pps") String pps,
-            RedirectAttributes redirectAttributes) {
-        // make sure the user is found in db by PPS and email
-        User user = userRepository.findByCredentials(email, pps);
-        if (user == null) {
-            redirectAttributes.addFlashAttribute("error", "Wrong credentials.");
-            return "redirect:/login";
-        }
-        userSession.setUserId(user.getId());
-        redirectAttributes.addFlashAttribute("success", "Welcome, " + user.getFullName() + "!");
-        return "redirect:/";
     }
 
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("userSession", userSession);
+        // Adding user attribute for BindingResult
+        model.addAttribute("user", new User());
         return "register";
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String register(User user, RedirectAttributes redirectAttributes) {
+    public String register(@ModelAttribute("user") User user, BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
         if (user.getDateOfBirth().isEmpty() || user.getEmail().isEmpty() || user.getAddress().isEmpty()
                 || user.getFullName().isEmpty() || user.getGender().isEmpty() || user.getNationality().isEmpty()
-                || user.getPhoneNumber().isEmpty() || user.getPPS().isEmpty()) {
+                || user.getPhoneNumber().isEmpty() || user.getPPS().isEmpty() || user.getPassword().isEmpty()
+                || user.getPasswordConfirm().isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "All fields are required!");
             return "redirect:/register";
         }
-        if (userRepository.findByPPS(user.getPPS()) != null) {
-            redirectAttributes.addFlashAttribute("error", "User with this PPS number already exists.");
+
+        userValidator.validate(user, bindingResult);
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("error", "Account could not be created. Invalid email or password.");
             return "redirect:/register";
         }
-        if (userRepository.findByEmail(user.getEmail()) != null) {
-            redirectAttributes.addFlashAttribute("error", "User with this email already exists.");
-            return "redirect:/register";
-        }
-        // Ensure user is 18 or older
-        if (isUserUnderage(user.getDateOfBirth())) {
-            redirectAttributes.addFlashAttribute("error", "Users under 18 cannot create an account.");
-            return "redirect:/register";
-        }
-        userRepository.save(user);
+
+        userService.save(user);
+        securityService.autoLogin(user.getEmail(), user.getPasswordConfirm());
         redirectAttributes.addFlashAttribute("success", "Account created! You can sign in now.");
         return "redirect:/login";
     }
@@ -499,8 +509,11 @@ public class AppController {
         return currentDate.format(formatter);
     }
 
-    private boolean isUserUnderage(String dateOfBirth) {
-        LocalDate dob = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        return Period.between(dob, LocalDate.now()).getYears() < 18;
+    private User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof String)
+            return null;
+        User user = userService.findByEmail(((UserDetails) principal).getUsername());
+        return user;
     }
 }
