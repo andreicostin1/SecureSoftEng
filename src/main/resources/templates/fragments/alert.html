@@ -1,4 +1,4 @@
-<th:block th:fragment="alert" th:if="${error != null or success != null}">
+<th:block th:fragment="alert" th:if="${error != null or success != null or param.error != null}">
     <div role="alert" class="alert alert-danger alert-dismissible mb-0" th:if="${error}">
         <span class="alert-inner--text">
             <span th:text="${error}">Error</span>
@@ -6,6 +6,16 @@
         <button type="button" data-dismiss="alert" aria-label="Close" class="close">
             <span aria-hidden="true">×</span>
         </button>
+    </div>
+
+    <div role="alert" class="alert alert-danger alert-dismissible mb-0" th:if="${param.error}">
+        <span class="alert-inner--text">
+            <span th:text="${session.SPRING_SECURITY_LAST_EXCEPTION.message}">Error</span>
+        </span>
+        <button type="button" data-dismiss="alert" aria-label="Close" class="close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <c:remove var = "session.SPRING_SECURITY_LAST_EXCEPTION" scope="session" />
     </div>
 
     <div role="alert" class="alert alert-success alert-dismissible mb-0" th:if="${success}">
