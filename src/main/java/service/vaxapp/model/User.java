@@ -7,6 +7,7 @@ import org.hibernate.annotations.Type;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -39,6 +40,15 @@ public class User {
     @Transient
     private String passwordConfirm;
 
+    @Column(name = "account_non_locked")
+    private boolean accountNonLocked = true;
+     
+    @Column(name = "failed_attempt")
+    private int failedAttempt;
+     
+    @Column(name = "lock_time")
+    private Date lockTime;
+
     // Bidirectional one-to-many relationship (One user may get multiple vaccines)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Vaccine> vaccines;
@@ -68,6 +78,8 @@ public class User {
         this.gender = gender;
         this.admin = admin;
         this.password = password;
+        this.accountNonLocked = true;
+        this.failedAttempt = 0;
     }
 
     public Integer getId() {
@@ -161,5 +173,29 @@ public class User {
 
     public void setPasswordConfirm(String passwordConfirm) {
         this.passwordConfirm = passwordConfirm;
+    }
+
+    public boolean isAccountNonLocked() {
+        return this.accountNonLocked;
+    }
+
+    public int getFailedAttempt() {
+        return this.failedAttempt;
+    }
+
+    public void setAccountNonLocked(boolean value) {
+        this.accountNonLocked = value;
+    }
+
+    public void setFailedAttempt(int failedAttempt) {
+        this.failedAttempt = failedAttempt;
+    }
+
+    public Date getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(Date lockTime) {
+        this.lockTime = lockTime;
     }
 }

@@ -30,13 +30,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/resources/**", "/styles/**", "/images/**", "/fonts/**", "/scripts/**", "/",
-                        "/register", "/stats", "/ask-a-question", "/question/**")
+                        "/register", "/stats", "/ask-a-question", "/question/**", "/login")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/login", true)
+                .failureHandler(loginFailureHandler)
+                .successHandler(loginSuccessHandler)
                 .permitAll()
                 .and()
                 .logout()
@@ -57,4 +58,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService).passwordEncoder(
                 bCryptPasswordEncoder());
     }
+
+    @Autowired
+    private CustomLoginFailureHandler loginFailureHandler;
+     
+    @Autowired
+    private CustomLoginSuccessHandler loginSuccessHandler;
 }
