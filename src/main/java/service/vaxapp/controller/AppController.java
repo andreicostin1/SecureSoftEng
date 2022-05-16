@@ -288,6 +288,12 @@ public class AppController {
         model.addAttribute("appointments", apps);
         model.addAttribute("vaccines", vaxes);
         model.addAttribute("userSession", userSession);
+        if (userSession.getUser() != null) {
+            User user = decryptAndSetSensitiveData(userSession.getUser());
+            if (user != null) {
+                userSession.setUserId(user.getId());
+            }
+        }
         model.addAttribute("userProfile", userSession.getUser());
         model.addAttribute("isSelf", true);
         model.addAttribute("userDoses", vaxes.size());

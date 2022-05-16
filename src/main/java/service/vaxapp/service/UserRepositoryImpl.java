@@ -40,7 +40,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
             } catch (Exception e) {
                 // TODO: add logging
                 System.out.println("An error occurred while decrypting pps for user in custom method. Error: "
-                        + e.getStackTrace());
+                        + e.toString());
             }
         }
         return null;

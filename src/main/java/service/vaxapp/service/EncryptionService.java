@@ -1,9 +1,9 @@
 package service.vaxapp.service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
@@ -19,8 +19,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class EncryptionService {
-    private static final String PASSWORD = "kjhgJHGUIloi3478OJKH,@££?fdgIMNGDF43jqzpp;ghJGS";
-    private static final String SALT = "PPsqC2319M?";
+    private static final String PASSWORD = "kjhgJHGUIloi3478OJKHsgdMSGF346ASD@$%^&*gfdjgkA,@££?fdgIMNGDF43jqzpp;ghJGS--=3!";
+    private static final String SALT = "PPsqC2319M?@@??$£?asdger";
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
 
     public static SecretKey getSecretKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -32,7 +32,6 @@ public class EncryptionService {
 
     public static IvParameterSpec generateIv() {
         byte[] iv = new byte[16];
-        new SecureRandom().nextBytes(iv);
         return new IvParameterSpec(iv);
     }
 
@@ -45,7 +44,7 @@ public class EncryptionService {
         IvParameterSpec iv = generateIv();
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key, iv);
-        byte[] cipherText = cipher.doFinal(input.getBytes());
+        byte[] cipherText = cipher.doFinal(input.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(cipherText);
     }
 
@@ -56,8 +55,20 @@ public class EncryptionService {
         SecretKey key = getSecretKey();
         IvParameterSpec iv = generateIv();
         Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, key, iv);
-        byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(cipherText));
-        return new String(plainText);
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
+        } catch (Exception e) {
+            // TODO: Add logging
+            System.out.println("An error occurred while initialising cipher on decrypt. Error: " + e);
+        }
+        try {
+            String decryptedString = new String(cipher.doFinal(Base64.getDecoder().decode(cipherText)));
+            System.out.println("Plaintext decoded string: " + decryptedString);
+            return decryptedString;
+        } catch (Exception e) {
+            // TODO: Add Logging
+            System.out.println("An error occurred while decoding with base64. Error + " + e);
+        }
+        return new String("");
     }
 }

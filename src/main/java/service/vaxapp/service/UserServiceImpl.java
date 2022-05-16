@@ -1,7 +1,6 @@
 package service.vaxapp.service;
 
 import service.vaxapp.model.User;
-// import service.vaxapp.repository.RoleRepository;
 import service.vaxapp.repository.UserRepository;
 
 import java.time.LocalDate;
@@ -18,8 +17,6 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
-    // @Autowired
-    // private RoleRepository roleRepository;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -35,7 +32,7 @@ public class UserServiceImpl implements UserService {
             user.setDateOfBirth(EncryptionService.encrypt(user.getDateOfBirth()));
         } catch (Exception e) {
             // TODO: add logging
-            System.out.println("Error occurred while encrypting sensitive dara. Error: " + e.getStackTrace());
+            System.out.println("Error occurred while encrypting sensitive data. Error: " + e.toString());
         }
         // user.setRoles(new HashSet<>(roleRepository.findAll()));
         userRepository.save(user);
