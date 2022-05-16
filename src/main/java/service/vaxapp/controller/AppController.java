@@ -179,18 +179,11 @@ public class AppController {
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String register(@ModelAttribute("user") User user, BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
-        if (user.getDateOfBirth().isEmpty() || user.getEmail().isEmpty() || user.getAddress().isEmpty()
-                || user.getFullName().isEmpty() || user.getGender().isEmpty() || user.getNationality().isEmpty()
-                || user.getPhoneNumber().isEmpty() || user.getPPS().isEmpty() || user.getPassword().isEmpty()
-                || user.getPasswordConfirm().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "All fields are required!");
-            logger.info("Guest registration failed due to missing fields.");
-            return "redirect:/register";
-        }
 
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Account could not be created. Invalid email or password.");
+            logger.info(bindingResult.getAllErrors().toString());
             return "redirect:/register";
         }
 
