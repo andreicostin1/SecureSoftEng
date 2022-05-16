@@ -139,6 +139,11 @@ public class User {
         return Period.between(birthday, LocalDate.now()).getYears();
     }
 
+    public int getAge(String dateOfBirth) {
+        LocalDate birthday = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        return Period.between(birthday, LocalDate.now()).getYears();
+    }
+
     public String getNationality() {
         return nationality;
     }

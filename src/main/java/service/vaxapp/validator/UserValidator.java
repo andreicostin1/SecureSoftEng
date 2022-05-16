@@ -2,12 +2,10 @@ package service.vaxapp.validator;
 
 import service.vaxapp.service.UserService;
 import service.vaxapp.model.User;
-import service.vaxapp.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import java.util.regex.Matcher;
@@ -29,14 +27,22 @@ public class UserValidator implements Validator {
 
         // ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "NotEmpty");
 
-        if ((user.getEmail().length() < 6 || user.getEmail().length() > 64) ||
-                (!isUserValid(user.getEmail())) ||
-                (userService.findByEmail(user.getEmail()) != null) ||
-                (userService.findByPPS(user.getPPS()) != null) ||
-                (userService.isUserUnderage(user.getDateOfBirth())) ||
-                (!user.getPasswordConfirm().equals(user.getPassword())) ||
-                (!isStrong(user.getPassword())))
+        if ((user.getEmail().length() < 6 || user.getEmail().length() > 64) || (!isUserValid(user.getEmail()))
+                || (userService.findByEmail(user.getEmail()) != null)) {
+            errors.rejectValue("email", "Diff.userForm.email");
+        }
+
+        if (userService.findByPPS(user.getPPS()) != null) {
+            errors.rejectValue("pps", "Diff.userForm.pps");
+        }
+
+        if (userService.isUserUnderage(user.getDateOfBirth())) {
+            errors.rejectValue("dateOfBirth", "Diff.userForm.dateOfBirth");
+        }
+
+        if ((!user.getPasswordConfirm().equals(user.getPassword())) || (!isStrong(user.getPassword()))) {
             errors.rejectValue("passwordConfirm", "Diff.userForm.passwordConfirm");
+        }
     }
 
     private boolean isUserValid(String email) {
