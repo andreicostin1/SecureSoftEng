@@ -61,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomLoginFailureHandler loginFailureHandler;
-     
+
     @Autowired
     private CustomLoginSuccessHandler loginSuccessHandler;
 }

@@ -1,5 +1,7 @@
 package service.vaxapp;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +28,8 @@ import java.util.List;
 
 @SpringBootApplication
 public class VaxApplication {
+        private static final Logger logger = LoggerFactory.getLogger(VaxApplication.class);
+
         public static void main(String[] args) {
                 SpringApplication.run(VaxApplication.class, args);
         }
@@ -37,7 +41,7 @@ public class VaxApplication {
                         AppointmentRepository appointmentRepo, ForumQuestionRepository forumQuestionRepo,
                         UserService userService) {
                 return args -> {
-                        System.out.println("VaxApp started");
+                        logger.info("VaxApp started");
 
                         if (userRepo.findAll().size() == 0) {
                                 // init db

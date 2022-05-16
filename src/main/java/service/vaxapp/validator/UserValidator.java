@@ -3,6 +3,8 @@ package service.vaxapp.validator;
 import service.vaxapp.service.UserService;
 import service.vaxapp.model.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -13,6 +15,8 @@ import java.util.regex.Pattern;
 
 @Component
 public class UserValidator implements Validator {
+    private static final Logger logger = LoggerFactory.getLogger(UserValidator.class);
+
     @Autowired
     private UserService userService;
 
@@ -29,18 +33,22 @@ public class UserValidator implements Validator {
 
         if ((user.getEmail().length() < 6 || user.getEmail().length() > 64) || (!isUserValid(user.getEmail()))
                 || (userService.findByEmail(user.getEmail()) != null)) {
+            logger.info("User (ID " + user.getId() + ") email not valid on registration.");
             errors.rejectValue("email", "Diff.userForm.email");
         }
 
         if (userService.findByPPS(user.getPPS()) != null) {
+            logger.info("User (ID " + user.getId() + ") attempts registration with existing PPS and is denied.");
             errors.rejectValue("pps", "Diff.userForm.pps");
         }
 
         if (userService.isUserUnderage(user.getDateOfBirth())) {
+            logger.info("Underage user (ID " + user.getId() + ") attempts registration and is denied.");
             errors.rejectValue("dateOfBirth", "Diff.userForm.dateOfBirth");
         }
 
         if ((!user.getPasswordConfirm().equals(user.getPassword())) || (!isStrong(user.getPassword()))) {
+            logger.info("User (ID " + user.getId() + ") password is not valid on registration.");
             errors.rejectValue("passwordConfirm", "Diff.userForm.passwordConfirm");
         }
     }
