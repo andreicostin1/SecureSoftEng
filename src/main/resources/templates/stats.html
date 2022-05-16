@@ -14,7 +14,8 @@
                 <div class="container py-lg px-4">
                     <h2>Stats </h2>
                     <h2 th:text="${totalDoses} + ' doses have been administered'"></h2>
-                    <form action="stats" method="post">
+                    <form th:action="@{/stats}" method="post">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                         <select name="nationality">
                             <option value="">Nationality</option>
                             <option value="afghan">Afghan</option>

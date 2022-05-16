@@ -28,7 +28,7 @@
                         <p class="lead text-white text-center">Set up an appointment to get your COVID-19
                             vaccine!</p>
 
-                        <form id="appointment-form" class="mt-5 mx-auto" action="make-appointment" method="POST">
+                        <form id="appointment-form" class="mt-5 mx-auto" th:action="@{/make-appointment}" method="POST">
                             <span class="text-white">Choose a vaccination center:</span>
                             <select class="form-control mt-1 mb-3 border-0" name="center_id" id="select-center">
                             </select>
@@ -38,6 +38,8 @@
                             <span class="text-white">Pick the right time slot:</span>
                             <select class="form-control mt-1 mb-3 border-0" name="time" id="select-time">
                             </select>
+
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                             <div class="text-center mt-4">
                                 <button type="submit" class="btn btn-neutral-outline btn-success">

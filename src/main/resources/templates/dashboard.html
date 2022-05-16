@@ -13,7 +13,8 @@
                 <div class="container shape-container py-lg">
                     <div class="card mt-3 shadow-sm" style="width: 100%;">
                         <div class="card-body py-3 px-5">
-                            <form action="find-user" method="POST">
+                            <form th:action="@{find-user}" method="POST">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                 <h5 class="card-title mb-3">Find user</h5>
                                 <div class="form-group input-group">
                                     <div class="input-group-prepend">
@@ -21,10 +22,9 @@
                                             <i class="fa fa-user"></i>
                                         </span>
                                     </div>
-                                    <input class="form-control" placeholder="PPS number" type="text"
-                                        name="pps"> <span><em>or</em></span>
-                                    <input class="form-control" placeholder="Full Name" type="text"
-                                        name="fullName">
+                                    <input class="form-control" placeholder="PPS number" type="text" name="pps">
+                                    <span><em>or</em></span>
+                                    <input class="form-control" placeholder="Full Name" type="text" name="fullName">
                                 </div>
                                 <button class="btn btn-primary" type="submit">
                                     <span class="btn-inner--icon"><i class="fa fa-search mr-1"></i></span>
