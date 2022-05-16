@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +36,9 @@ import java.util.stream.Collectors;
 
 @Controller
 public class AppController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AppController.class);
+
     @Autowired
     private AppointmentRepository appointmentRepository;
     @Autowired
@@ -84,14 +89,18 @@ public class AppController {
     public String makeAppointment(@RequestParam Map<String, String> body, Model model,
             RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn()) {
+            logger.info("Guest attempted to make an appointment.");
             redirectAttributes.addFlashAttribute("error", "You must be logged in to make an appointment.");
             return "redirect:/login";
         }
 
         // A user shouldn't have more than one pending appointment
         if (appointmentRepository.findPending(userSession.getUserId()) != null) {
+            logger.info("User (ID " + userSession.getUserId()
+                    + ") denied appointment due to existing pending appointment.");
             redirectAttributes.addFlashAttribute("error",
                     "You can only have one pending appointment at a time. Please check your appointment list.");
+
             return "redirect:/";
         }
 
@@ -109,6 +118,10 @@ public class AppController {
                 userSession.getUser(), "pending");
         appointmentRepository.save(app);
         appointmentSlotRepository.delete(appSlot);
+
+        logger.info("User (ID " + userSession.getUserId() + ") successfully booked an appointment at "
+                + app.getVaccineCentre().getName() + " on "
+                + app.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
         redirectAttributes.addFlashAttribute("success",
                 "Your appointment has been made! Please see the details of your new appointment.");
@@ -132,11 +145,10 @@ public class AppController {
      */
     @GetMapping("/login")
     public String login(Model model, String error, String logout, RedirectAttributes redirectAttributes) {
-        // if (error != null)
-        //     model.addAttribute("error", "Your username and password is invalid.");
-
-        if (logout != null)
+        if (logout != null) {
+            logger.info("User logged out succesfully.");
             model.addAttribute("logout", "You have been logged out successfully.");
+        }
 
         User currentUser = getCurrentUser();
         if (currentUser != null) {
@@ -157,6 +169,7 @@ public class AppController {
 
     @GetMapping("/register")
     public String register(Model model) {
+        logger.info("Guest navigated to registration page");
         model.addAttribute("userSession", userSession);
         // Adding user attribute for BindingResult
         model.addAttribute("user", new User());
@@ -171,6 +184,7 @@ public class AppController {
                 || user.getPhoneNumber().isEmpty() || user.getPPS().isEmpty() || user.getPassword().isEmpty()
                 || user.getPasswordConfirm().isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "All fields are required!");
+            logger.info("Guest registration failed due to missing fields.");
             return "redirect:/register";
         }
 
@@ -188,6 +202,8 @@ public class AppController {
 
     @GetMapping("/logout")
     public String logout() {
+        logger.info((userSession.getUser().isAdmin() ? "Admin" : "User") + " (ID " + userSession.getUserId()
+                + ") logged out successfully!");
         userSession.setUserId(null);
         return "redirect:/";
     }
@@ -205,6 +221,7 @@ public class AppController {
     public String askAQuestion(Model model, RedirectAttributes redirectAttributes) {
         // If not logged in or admin, return to forum
         if (!userSession.isLoggedIn() || userSession.getUser().isAdmin()) {
+            logger.info("Guest attempted to access the ask-a-question page.");
             redirectAttributes.addFlashAttribute("error", "Users must be logged in to ask questions.");
             return "redirect:/forum";
         }
@@ -218,6 +235,11 @@ public class AppController {
             RedirectAttributes redirectAttributes) {
         // If user is not logged in or is admin
         if (!userSession.isLoggedIn() || userSession.getUser().isAdmin()) {
+            if (userSession.getUser().isAdmin()) {
+                logger.info("Admin (ID " + userSession.getUserId() + ") attempted to ask a question on the forum.");
+            } else {
+                logger.info("Guest attempted to ask question on the forum.");
+            }
             redirectAttributes.addFlashAttribute("error", "Users must be logged in to ask questions.");
             return "redirect:/forum";
         }
@@ -227,6 +249,9 @@ public class AppController {
 
         // Add question to database
         forumQuestionRepository.save(newQuestion);
+
+        logger.info("User (ID " + userSession.getUserId() + ") asked '" + newQuestion.getTitle() + "' (ID "
+                + newQuestion.getId() + ") on the forum.");
 
         redirectAttributes.addFlashAttribute("success", "The question was successfully submitted.");
 
@@ -253,10 +278,19 @@ public class AppController {
                     question.get().addAnswer(newAnswer);
                     forumQuestionRepository.save(question.get());
 
+                    logger.info("Admin (ID " + userSession.getUserId() + ") provided answer (ID " + newAnswer.getId()
+                            + ") to question '" + question.get().getTitle() + "' (ID " + questionId + ").");
+
                     redirectAttributes.addFlashAttribute("success", "The answer was successfully submitted.");
                     // Redirect to updated question page
                     return "redirect:/question?id=" + question.get().getId();
                 } else {
+                    if (!userSession.isLoggedIn()) {
+                        logger.info("Guest attempted to answer question (ID " + questionId + ").");
+                    } else {
+                        logger.info("User (ID " + userSession.getUserId() + ") attempted to answer question (ID "
+                                + questionId + ").");
+                    }
                     redirectAttributes.addFlashAttribute("error",
                             "Only admins may answer questions. If you are an admin, please log in.");
                     // Redirect to unchanged same question page
@@ -324,6 +358,8 @@ public class AppController {
             List<Vaccine> vaxes = vaccineRepository.findByUser(user.get().getId());
 
             if (userSession.isLoggedIn() && userSession.getUser().isAdmin()) {
+                logger.info("Admin (ID " + userSession.getUserId() + ") accessed user profile for User (ID "
+                        + user.get().getId() + ").");
                 // admins can see everybody's appointments
                 List<Appointment> apps = appointmentRepository.findByUser(user.get().getId());
                 Collections.reverse(apps);
@@ -347,14 +383,17 @@ public class AppController {
 
     @GetMapping("/cancel-appointment/{stringId}")
     public String cancelAppointment(@PathVariable String stringId, RedirectAttributes redirectAttributes) {
-        if (!userSession.isLoggedIn())
+        if (!userSession.isLoggedIn()) {
+            logger.info("Guest attempted to cancel appointment (ID " + new String(stringId) + ").");
             return "redirect:/login";
+        }
 
         Integer id = Integer.valueOf(stringId);
         Appointment app = appointmentRepository.findById(id).get();
 
         if (!userSession.getUser().isAdmin() && userSession.getUser().getId() != app.getUser().getId()) {
             // Hacker detected! You can't cancel someone else's appointment!
+            logger.info("Guest attempted to cancel appointment (ID " + new String(stringId) + ").");
             return "404";
         }
 
@@ -363,6 +402,13 @@ public class AppController {
 
         AppointmentSlot appSlot = new AppointmentSlot(app.getVaccineCentre(), app.getDate(), app.getTime());
         appointmentSlotRepository.save(appSlot);
+        if (userSession.getUser().isAdmin()) {
+            logger.info("Admin (ID " + userSession.getUserId() + " cancelled appointment (ID " + new String(stringId)
+                    + ").");
+        } else {
+            logger.info("User (ID " + userSession.getUserId() + " cancelled appointment (ID " + new String(stringId)
+                    + ").");
+        }
 
         redirectAttributes.addFlashAttribute("success", "The appointment was successfully cancelled.");
 
@@ -395,8 +441,14 @@ public class AppController {
      */
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin())
+        if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin()) {
+            if (userSession.isLoggedIn()) {
+                logger.info("User (ID " + userSession.getUserId() + ") attempted to access admin dashboard.");
+            } else {
+                logger.info("Guest attempted to access admin dashboard.");
+            }
             return "redirect:/login";
+        }
 
         model.addAttribute("users", userRepository.findAll());
         model.addAttribute("userSession", userSession);
@@ -405,11 +457,22 @@ public class AppController {
 
     @PostMapping(value = "/find-user")
     public String findUser(@RequestParam Map<String, String> body, Model model, RedirectAttributes redirectAttributes) {
+        if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin()) {
+            if (userSession.isLoggedIn()) {
+                logger.info("User (ID " + userSession.getUserId() + ") attempted to lookup other user.");
+            } else {
+                logger.info("Guest attempted to lookup other user.");
+            }
+            redirectAttributes.addFlashAttribute("error", "Users cannot look up other users.");
+            return "redirect:/login";
+        }
+
         String fullName = body.get("fullName");
         String pps = body.get("pps");
         User user = null;
 
         if (fullName.isEmpty() && pps.isEmpty()) {
+            logger.info("Admin (ID " + userSession.getUserId() + ") performed user lookup without PPS or Full Name.");
             redirectAttributes.addFlashAttribute("error", "One of PPS or Full Name is needed to search.");
         } else if (!fullName.isEmpty()) {
             user = userRepository.findByFullBName(fullName);
@@ -419,8 +482,12 @@ public class AppController {
         }
 
         if (user == null) {
+            logger.info("Admin (ID " + userSession.getUserId() + ") user lookup failed.");
             return "redirect:/dashboard";
         }
+
+        logger.info(
+                "Admin (ID " + userSession.getUserId() + ") user lookup succeeded for user (ID " + user.getId() + ").");
 
         return "redirect:/profile/" + user.getId();
     }
@@ -429,6 +496,12 @@ public class AppController {
     public String assignVaccine(@RequestParam Map<String, String> body, Model model,
             RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin()) {
+            if (userSession.isLoggedIn()) {
+                logger.info("User (ID " + userSession.getUserId() + ") attempted to assign vaccine to user (ID "
+                        + new String(body.get("user_id")) + ").");
+            } else {
+                logger.info("Guest attempted to lookup other user.");
+            }
             return "redirect:/login";
         }
 
@@ -464,6 +537,8 @@ public class AppController {
             // Creating new appointment for the user
             appointment = new Appointment(vaxCentre, date, time, user, "pending");
             appointmentRepository.save(appointment);
+            logger.info("Automatic follow-up appointment recorded for user (ID " + vaxUser.getId() + ") at "
+                    + vaxCentre.getName() + " on " + date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + ".");
             redirectAttributes.addFlashAttribute("success",
                     "The vaccine was recorded and a new appointment at least 3 weeks from now has been made for the user.");
         }
@@ -471,15 +546,22 @@ public class AppController {
         Vaccine vax = new Vaccine(userSession.getUser(), vaxDate, vaxCentre, vaxUser, vaxType);
         vaccineRepository.save(vax);
 
+        logger.info("Admin (ID " + userSession.getUserId() + ") recorded " + vax.getType() + "vaccine (ID "
+                + vax.getId() + ") for user (ID " + vaxUser.getId() + ").");
+
         return "redirect:/profile/" + userId;
     }
 
     @GetMapping("/complete-appointment/{stringId}")
     public String completeAppointment(@PathVariable String stringId, RedirectAttributes redirectAttributes) {
-        if (!userSession.isLoggedIn())
+        if (!userSession.isLoggedIn()) {
+            logger.info("Guest attempted to complete appointment (ID " + new String(stringId) + ").");
             return "redirect:/login";
+        }
 
         if (!userSession.getUser().isAdmin()) {
+            logger.info("User (ID" + userSession.getUserId() + ") attempted to complete appointment (ID "
+                    + new String(stringId) + ").");
             // Hacker detected! You can't modify if you're not an admin!
             return "404";
         }
@@ -489,6 +571,9 @@ public class AppController {
 
         app.setStatus("done");
         appointmentRepository.save(app);
+
+        logger.info(
+                "Admin (ID" + userSession.getUserId() + ") completed appointment (ID " + new String(stringId) + ").");
 
         redirectAttributes.addFlashAttribute("success", "The appointment was marked as complete.");
 
@@ -541,8 +626,7 @@ public class AppController {
                     String decodedDateOfBirthString = EncryptionService.decrypt(x.getDateOfBirth());
                     return x.getAge(decodedDateOfBirthString) / 10 == i.get();
                 } catch (Exception e) {
-                    // TODO: add logging
-                    System.out.println("Error occurred while decoding dob. Error: " + e.getStackTrace());
+                    logger.error("Error occurred while decoding date of birth. Error: " + e.toString());
                     return false;
                 }
             }).count();
@@ -565,8 +649,7 @@ public class AppController {
             user.setPPS(decodedPPS);
             user.setPhoneNumber(decodedPhoneNumber);
         } catch (Exception e) {
-            // TODO: Add logging
-            System.out.println("An error occurred while trying to decrypt sensitive data. Error: " + e.getStackTrace());
+            logger.error("An error occurred while trying to decrypt sensitive data. Error: " + e);
             return null;
         }
         return user;

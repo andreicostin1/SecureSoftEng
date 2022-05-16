@@ -8,6 +8,8 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private static final long LOCK_TIME_DURATION = 30000; // 30 seconds
 
     @Autowired
@@ -34,8 +37,7 @@ public class UserServiceImpl implements UserService {
             user.setPhoneNumber(EncryptionService.encrypt(user.getPhoneNumber()));
             user.setDateOfBirth(EncryptionService.encrypt(user.getDateOfBirth()));
         } catch (Exception e) {
-            // TODO: add logging
-            System.out.println("Error occurred while encrypting sensitive data. Error: " + e.toString());
+            logger.error("Error occurred while encrypting sensitive data. Error: " + e.toString());
         }
         // user.setRoles(new HashSet<>(roleRepository.findAll()));
         userRepository.save(user);
@@ -61,35 +63,41 @@ public class UserServiceImpl implements UserService {
         int newFailAttempts = user.getFailedAttempt() + 1;
         user.setFailedAttempt(newFailAttempts);
         userRepository.save(user);
+        logger.info("Account for user (ID " + user.getId() + ") failed authentication attempt.");
         // userRepository.updateFailedAttempts(newFailAttempts, user.getEmail());
     }
-     
+
     public void resetFailedAttempts(User user) {
+        logger.info("Failed authentication attempts reset to 0 for user (ID " + user.getId() + ").");
         user.setFailedAttempt(0);
         userRepository.save(user);
     }
-     
+
     public void lock(User user) {
         user.setAccountNonLocked(false);
         user.setLockTime(new Date());
-         
+
+        logger.info("Account locked for user (ID " + user.getId() + ") after 3 consecutive failed attempts.");
+
         userRepository.save(user);
     }
-     
+
     public boolean unlockWhenTimeExpired(User user) {
         long lockTimeInMillis = user.getLockTime().getTime();
         long currentTimeInMillis = System.currentTimeMillis();
-         
+
         if (lockTimeInMillis + LOCK_TIME_DURATION < currentTimeInMillis) {
             user.setAccountNonLocked(true);
             user.setLockTime(null);
             user.setFailedAttempt(0);
-             
+
+            logger.info("Account unlocked for user (ID " + user.getId() + ") after lock time expired.");
+
             userRepository.save(user);
-             
+
             return true;
         }
-         
+
         return false;
     }
 }

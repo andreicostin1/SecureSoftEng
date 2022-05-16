@@ -14,9 +14,10 @@ public interface UserService {
     boolean isUserUnderage(String dateOfBirth);
 
     void increaseFailedAttempts(User user);
+
     void resetFailedAttempts(User user);
-     
+
     void lock(User user);
-     
+
     boolean unlockWhenTimeExpired(User user);
 }

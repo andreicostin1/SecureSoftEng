@@ -8,6 +8,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import service.vaxapp.repository.UserRepositoryCustom;
 @Repository
 @Transactional(readOnly = true)
 public class UserRepositoryImpl implements UserRepositoryCustom {
+    private static final Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 
     @PersistenceContext
     EntityManager entityManager;
@@ -38,8 +41,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                     return user;
                 }
             } catch (Exception e) {
-                // TODO: add logging
-                System.out.println("An error occurred while decrypting pps for user in custom method. Error: "
+                logger.error("An error occurred while decrypting pps for user in custom PPS lookup method. Error: "
                         + e.toString());
             }
         }

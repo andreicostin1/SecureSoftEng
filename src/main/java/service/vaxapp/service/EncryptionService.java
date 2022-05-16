@@ -18,7 +18,11 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class EncryptionService {
+    private static final Logger logger = LoggerFactory.getLogger(EncryptionService.class);
     private static final String PASSWORD = "kjhgJHGUIloi3478OJKHsgdMSGF346ASD@$%^&*gfdjgkA,@££?fdgIMNGDF43jqzpp;ghJGS--=3!";
     private static final String SALT = "PPsqC2319M?@@??$£?asdger";
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
@@ -58,16 +62,13 @@ public class EncryptionService {
         try {
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
         } catch (Exception e) {
-            // TODO: Add logging
-            System.out.println("An error occurred while initialising cipher on decrypt. Error: " + e);
+            logger.error("An error occurred while initialising cipher on decrypt. Error: " + e);
         }
         try {
             String decryptedString = new String(cipher.doFinal(Base64.getDecoder().decode(cipherText)));
-            System.out.println("Plaintext decoded string: " + decryptedString);
             return decryptedString;
         } catch (Exception e) {
-            // TODO: Add Logging
-            System.out.println("An error occurred while decoding with base64. Error + " + e);
+            logger.error("An error occurred while decoding with base64. Error + " + e);
         }
         return new String("");
     }
