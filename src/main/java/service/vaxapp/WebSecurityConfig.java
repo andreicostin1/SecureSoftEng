@@ -1,7 +1,12 @@
 package service.vaxapp;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,9 +33,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .requiresChannel().anyRequest().requiresSecure()
+                .and()
                 .authorizeRequests()
                 .antMatchers("/resources/**", "/styles/**", "/images/**", "/fonts/**", "/scripts/**", "/",
                         "/register", "/stats", "/ask-a-question", "/question/**", "/login")
+
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -61,7 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomLoginFailureHandler loginFailureHandler;
-     
+
     @Autowired
     private CustomLoginSuccessHandler loginSuccessHandler;
 }
