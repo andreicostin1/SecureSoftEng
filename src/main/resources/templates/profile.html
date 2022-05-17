@@ -71,13 +71,15 @@
 
             <div class="text-center mt-5">
               <h3>
-                <span th:text="${userProfile.getFullName()}">John Doe</span>,
-                <span class="font-weight-light" th:text="${userProfile.getAge()}">45</span>
+                <span th:text="${userProfile.getFullName()}">John Doe</span>
+                <span th:if="${userSession.isLoggedIn()}" class="font-weight-light"
+                  th:text="${', ' + userProfile.getAge().toString()}">45</span>
               </h3>
               <div th:if="${isSelf == true || (userSession.isLoggedIn() && userSession.getUser().isAdmin())}"
                 class="h6 font-weight-300">
                 <i class="ni location_pin mr-2"></i>
-                <span th:text="${userProfile.getAddress()}">Bucharest, Romania</span>
+                <span th:if="${userSession.isLoggedIn()}" th:text="${userProfile.getAddress()}">Bucharest,
+                  Romania</span>
               </div>
             </div>
 

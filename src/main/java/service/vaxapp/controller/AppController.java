@@ -372,9 +372,11 @@ public class AppController {
             model.addAttribute("vaccineCenters", vaccineCentreRepository.findAll());
             model.addAttribute("userSession", userSession);
             model.addAttribute("userProfile", decryptedUser);
-            model.addAttribute("userQuestions", forumQuestionRepository.findByUser(decryptedUser.getId()).size());
-            model.addAttribute("userDoses", vaxes.size());
-            model.addAttribute("userAppts", appointmentRepository.findByUser(decryptedUser.getId()).size());
+
+
+            // model.addAttribute("userQuestions", forumQuestionRepository.findByUser(decryptedUser.getId()).size());
+            // model.addAttribute("userDoses", vaxes.size());
+            // model.addAttribute("userAppts", appointmentRepository.findByUser(decryptedUser.getId()).size());
             return "profile";
         } catch (NumberFormatException ex) {
             return "404";
