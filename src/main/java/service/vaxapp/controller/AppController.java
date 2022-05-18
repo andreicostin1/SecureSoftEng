@@ -1,16 +1,5 @@
 package service.vaxapp.controller;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +19,11 @@ import service.vaxapp.service.SecurityService;
 import service.vaxapp.service.UserService;
 import service.vaxapp.validator.UserValidator;
 
+import javax.validation.Valid;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -87,7 +81,7 @@ public class AppController {
 
     @PostMapping(value = "/make-appointment")
     public String makeAppointment(@RequestParam Map<String, String> body, Model model,
-            RedirectAttributes redirectAttributes) {
+                                  RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn()) {
             logger.info("Guest attempted to make an appointment.");
             redirectAttributes.addFlashAttribute("error", "You must be logged in to make an appointment.");
@@ -177,20 +171,13 @@ public class AppController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String register(@ModelAttribute("user") User user, BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
-        if (user.getDateOfBirth().isEmpty() || user.getEmail().isEmpty() || user.getAddress().isEmpty()
-                || user.getFullName().isEmpty() || user.getGender().isEmpty() || user.getNationality().isEmpty()
-                || user.getPhoneNumber().isEmpty() || user.getPPS().isEmpty() || user.getPassword().isEmpty()
-                || user.getPasswordConfirm().isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "All fields are required!");
-            logger.info("Guest registration failed due to missing fields.");
-            return "redirect:/register";
-        }
+    public String register(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
+                           RedirectAttributes redirectAttributes) {
 
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("error", "Account could not be created. Invalid email or password.");
+            logger.info(bindingResult.getAllErrors().toString());
             return "redirect:/register";
         }
 
@@ -232,7 +219,7 @@ public class AppController {
 
     @PostMapping("/ask-a-question")
     public String askAQuestion(@RequestParam String title, @RequestParam String details, Model model,
-            RedirectAttributes redirectAttributes) {
+                               RedirectAttributes redirectAttributes) {
         // If user is not logged in or is admin
         if (!userSession.isLoggedIn() || userSession.getUser().isAdmin()) {
             if (userSession.getUser().isAdmin()) {
@@ -261,7 +248,7 @@ public class AppController {
 
     @PostMapping("/question")
     public String answerQuestion(@RequestParam String body, @RequestParam String id, Model model,
-            RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes) {
         // Retrieving question
         try {
             Integer questionId = Integer.parseInt(id);
@@ -386,7 +373,7 @@ public class AppController {
     @GetMapping("/cancel-appointment/{stringId}")
     public String cancelAppointment(@PathVariable String stringId, RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn()) {
-            logger.info("Guest attempted to cancel appointment (ID " + new String(stringId) + ").");
+            logger.info("Guest attempted to cancel appointment (ID " + stringId + ").");
             return "redirect:/login";
         }
 
@@ -395,7 +382,7 @@ public class AppController {
 
         if (!userSession.getUser().isAdmin() && userSession.getUser().getId() != app.getUser().getId()) {
             // Hacker detected! You can't cancel someone else's appointment!
-            logger.info("Guest attempted to cancel appointment (ID " + new String(stringId) + ").");
+            logger.info("Guest attempted to cancel appointment (ID " + stringId + ").");
             return "404";
         }
 
@@ -405,10 +392,10 @@ public class AppController {
         AppointmentSlot appSlot = new AppointmentSlot(app.getVaccineCentre(), app.getDate(), app.getTime());
         appointmentSlotRepository.save(appSlot);
         if (userSession.getUser().isAdmin()) {
-            logger.info("Admin (ID " + userSession.getUserId() + " cancelled appointment (ID " + new String(stringId)
+            logger.info("Admin (ID " + userSession.getUserId() + " cancelled appointment (ID " + stringId
                     + ").");
         } else {
-            logger.info("User (ID " + userSession.getUserId() + " cancelled appointment (ID " + new String(stringId)
+            logger.info("User (ID " + userSession.getUserId() + " cancelled appointment (ID " + stringId
                     + ").");
         }
 
@@ -423,7 +410,7 @@ public class AppController {
 
     @GetMapping("/question")
     public String getQuestionById(@RequestParam(name = "id") Integer id, Model model,
-            RedirectAttributes redirectAttributes) {
+                                  RedirectAttributes redirectAttributes) {
         // Retrieve question
         Optional<ForumQuestion> question = forumQuestionRepository.findById(id);
         if (question.isPresent()) {
@@ -496,11 +483,11 @@ public class AppController {
 
     @PostMapping(value = "/assign-vaccine")
     public String assignVaccine(@RequestParam Map<String, String> body, Model model,
-            RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn() || !userSession.getUser().isAdmin()) {
             if (userSession.isLoggedIn()) {
                 logger.info("User (ID " + userSession.getUserId() + ") attempted to assign vaccine to user (ID "
-                        + new String(body.get("user_id")) + ").");
+                        + body.get("user_id") + ").");
             } else {
                 logger.info("Guest attempted to lookup other user.");
             }
@@ -557,13 +544,13 @@ public class AppController {
     @GetMapping("/complete-appointment/{stringId}")
     public String completeAppointment(@PathVariable String stringId, RedirectAttributes redirectAttributes) {
         if (!userSession.isLoggedIn()) {
-            logger.info("Guest attempted to complete appointment (ID " + new String(stringId) + ").");
+            logger.info("Guest attempted to complete appointment (ID " + stringId + ").");
             return "redirect:/login";
         }
 
         if (!userSession.getUser().isAdmin()) {
             logger.info("User (ID" + userSession.getUserId() + ") attempted to complete appointment (ID "
-                    + new String(stringId) + ").");
+                    + stringId + ").");
             // Hacker detected! You can't modify if you're not an admin!
             return "404";
         }
@@ -575,7 +562,7 @@ public class AppController {
         appointmentRepository.save(app);
 
         logger.info(
-                "Admin (ID" + userSession.getUserId() + ") completed appointment (ID " + new String(stringId) + ").");
+                "Admin (ID" + userSession.getUserId() + ") completed appointment (ID " + stringId + ").");
 
         redirectAttributes.addFlashAttribute("success", "The appointment was marked as complete.");
 
@@ -628,7 +615,7 @@ public class AppController {
                     String decodedDateOfBirthString = EncryptionService.decrypt(x.getDateOfBirth());
                     return x.getAge(decodedDateOfBirthString) / 10 == i.get();
                 } catch (Exception e) {
-                    logger.error("Error occurred while decoding date of birth. Error: " + e.toString());
+                    logger.error("Error occurred while decoding date of birth. Error: " + e);
                     return false;
                 }
             }).count();

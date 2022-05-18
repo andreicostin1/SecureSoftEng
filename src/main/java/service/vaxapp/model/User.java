@@ -1,6 +1,9 @@
 package service.vaxapp.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.Type;
 
@@ -17,20 +20,29 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "user_pps", unique = true)
+    @NotBlank(message = "PPS cannot be blank")
+    @Pattern(regexp = "\\d{7}[A-Z]{1,2}", message = "Please enter a valid PPS number")
     private String PPS;
     @Column(name = "full_name")
+    @NotBlank(message = "Name cannot be blank")
     private String fullName;
     @Column
+    @NotBlank(message = "Address cannot be blank")
     private String address;
     @Column(name = "phone_number")
+    @Pattern(regexp="^[0-9]*$", message = "Please enter a valid phone number")
     private String phoneNumber;
     @Column
+    @Email(message = "Please enter a valid email")
     private String email;
     @Column(name = "date_of_birth")
+    @NotBlank(message = "Date of birth cannot be blank")
     private String dateOfBirth;
     @Column
+    @NotBlank(message = "Nationality cannot be blank")
     private String nationality;
     @Column
+    @NotBlank(message = "Gender cannot be blank")
     private String gender;
     @Column(nullable = false)
     @Type(type = "org.hibernate.type.NumericBooleanType")
