@@ -21,6 +21,7 @@ public class User {
     private Integer id;
     @Column(name = "user_pps", unique = true)
     @NotBlank(message = "PPS cannot be blank")
+    @Pattern(regexp = "\\d{7}[A-Z]{1,2}", message = "Please enter a valid PPS number")
     private String PPS;
     @Column(name = "full_name")
     @NotBlank(message = "Name cannot be blank")
@@ -29,7 +30,7 @@ public class User {
     @NotBlank(message = "Address cannot be blank")
     private String address;
     @Column(name = "phone_number")
-    @Pattern(regexp="(^$|[0-9]{10})", message = "Please enter a valid phone number")
+    @Pattern(regexp="^[0-9]*$", message = "Please enter a valid phone number")
     private String phoneNumber;
     @Column
     @Email(message = "Please enter a valid email")
